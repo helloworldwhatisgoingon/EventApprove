@@ -179,3 +179,14 @@ WHERE workshopTitle = 'Advanced Python Workshop';
 SELECT brochure
 FROM Workshop
 WHERE workshopTitle = 'Advanced Python Workshop';
+
+-- Change this as you like
+CREATE TABLE "Event" (
+    "eventID" SERIAL PRIMARY KEY,
+    "eventTitle" VARCHAR(100) NOT NULL,
+    "eventType" VARCHAR(50) NOT NULL,
+    "startDate" DATE NOT NULL,
+    "endDate" DATE NOT NULL,
+    "location" VARCHAR(100) NOT NULL,
+    "approval" BOOLEAN DEFAULT FALSE
+);
