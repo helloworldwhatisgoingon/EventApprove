@@ -1,4 +1,4 @@
-# Event Approval API Server Setup
+# Event Approval Flask Server Setup
 
 This project has a Flask server for managing event approvals, using a PostgreSQL database and Swagger for API documentation.
 
