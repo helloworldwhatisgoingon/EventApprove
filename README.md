@@ -40,4 +40,4 @@ Once the server is running, you can access the API documentation at:
 
 ## Additional Information
 - Ensure that PostgreSQL is running on your machine and that the credentials in `config.py` match your setup.
-- This project uses SQLAlchemy for ORM operations and Flasgger for generating Swagger-based API documentation.
+- This project uses SQLAlchemy for ORM operations and flask_restx for generating Swagger-based API documentation.
