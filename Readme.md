@@ -1,4 +1,4 @@
-# Project Database Setup
+# Database Setup
 
 ## Overview
 This repository contains the `.sql` file needed to set up the database for the project.
