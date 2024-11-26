@@ -1,14 +1,18 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For date formatting
+import 'package:file_picker/file_picker.dart'; // For file picking
 
 void main() {
   runApp(const DashboardApp());
 }
 
+Repository repository = Repository();
+
 class DashboardApp extends StatelessWidget {
   const DashboardApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -102,7 +106,10 @@ class SidebarButton extends StatelessWidget {
   final ValueChanged<int> onPressed;
 
   const SidebarButton(
-      {super.key, required this.label, required this.index, required this.onPressed});
+      {super.key,
+      required this.label,
+      required this.index,
+      required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +123,8 @@ class SidebarButton extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 16)),
+        child: Text(label,
+            style: const TextStyle(color: Colors.white, fontSize: 16)),
       ),
     );
   }
@@ -144,30 +152,87 @@ class CreateProposalPage extends StatefulWidget {
 }
 
 class _CreateProposalPageState extends State<CreateProposalPage> {
+  static List<Map<String, dynamic>> proposals = [];
   int _currentStep = 0;
+
   final List<String> _stepsQuestions = [
-    "Enter Idea Title:",
-    "Enter Idea Description:",
-    "Upload Important Documents:",
+    "Enter Event Name:",
+    "Enter Event Type:",
     "Enter Faculty Involved:",
-    "Provide Additional Information:",
+    "Enter Venue:",
+    "Enter Date:",
+    "Enter Timings:",
+    "Upload Documents:"
   ];
 
-  final Map<String, String> _currentProposal = {
-    "title": "",
-    "description": "",
-    "documents": "",
+  final Map<String, dynamic> _currentProposal = {
+    "eventName": "",
+    "eventType": "",
     "faculty": "",
-    "info": ""
+    "venue": "",
+    "date": "",
+    "timings": "",
+    "document": null // Storing the file object here
   };
 
-  static List<Map<String, String>> proposals = [];
   final TextEditingController _textController = TextEditingController();
 
   @override
   void dispose() {
     _textController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _currentProposal['date'] = picked.toIso8601String().split('T')[0];
+      });
+    }
+  }
+
+  Future<void> _pickDocument() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      setState(() {
+        _currentProposal['document'] = result.files.single.path; // Storing path
+      });
+    }
+  }
+
+  Future<void> _submitProposal() async {
+    try {
+      await repository.submitProposal(
+        eventName: _currentProposal['eventName'] ?? "",
+        eventType: _currentProposal['eventType'] ?? "",
+        startDate: _currentProposal['date'] ?? "",
+        endDate: _currentProposal['date'] ?? "",
+        location: _currentProposal['venue'] ?? "",
+        approval: false,
+        documentPath: _currentProposal['document'],
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Proposal submitted successfully!")),
+      );
+
+      setState(() {
+        _currentStep = 0;
+        _currentProposal.clear();
+        _textController.clear();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
   }
 
   @override
@@ -185,16 +250,16 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 color: Color(0xff2F4F6F)),
           ),
         ),
-        if (_currentStep != 2)
+        if (_currentStep < 4)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextField(
               controller: _textController,
               onChanged: (value) {
-                if (_currentStep == 0) _currentProposal['title'] = value;
-                if (_currentStep == 1) _currentProposal['description'] = value;
-                if (_currentStep == 3) _currentProposal['faculty'] = value;
-                if (_currentStep == 4) _currentProposal['info'] = value;
+                if (_currentStep == 0) _currentProposal['eventName'] = value;
+                if (_currentStep == 1) _currentProposal['eventType'] = value;
+                if (_currentStep == 2) _currentProposal['faculty'] = value;
+                if (_currentStep == 3) _currentProposal['venue'] = value;
               },
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
@@ -204,32 +269,51 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
             ),
           ),
-        if (_currentStep == 2)
+        if (_currentStep == 4)
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () async {
-                _currentProposal['documents'] = "Document Uploaded";
-                setState(() {});
+              onPressed: () => _pickDate(context),
+              child: const Text("Pick Date"),
+            ),
+          ),
+        if (_currentStep == 5) // Timings step
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TextField(
+              controller: _textController,
+              onChanged: (value) {
+                _currentProposal['timings'] = value;
               },
-              child: const Text('Upload Document'),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText:
+                    'Enter event timings here (e.g., 10:00 AM - 12:00 PM)',
+                filled: true,
+                fillColor: Colors.grey[200],
+              ),
+            ),
+          ),
+        if (_currentStep == 6)
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: _pickDocument,
+              child: const Text("Upload Document"),
             ),
           ),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
             onPressed: () {
-              setState(() {
-                if (_currentStep < _stepsQuestions.length - 1) {
+              if (_currentStep < _stepsQuestions.length - 1) {
+                setState(() {
                   _currentStep++;
-                  _textController.clear(); // Clear the text field
-                } else {
-                  proposals.add(Map.from(_currentProposal));
-                  _currentStep = 0;
-                  _currentProposal.clear();
                   _textController.clear();
-                }
-              });
+                });
+              } else {
+                _submitProposal();
+              }
             },
             child: Text(
                 _currentStep == _stepsQuestions.length - 1 ? 'Submit' : 'Next'),
@@ -249,13 +333,14 @@ class ProposalStepsWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
-        5,
+        7,
         (index) => Container(
           margin: const EdgeInsets.all(8),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: index <= currentStep ? Colors.green : const Color(0xff2F4F6F),
+            color:
+                index <= currentStep ? Colors.green : const Color(0xff2F4F6F),
             border: Border.all(color: Colors.white, width: 2),
           ),
           child: Text(
@@ -284,15 +369,21 @@ class ViewSubmissionsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Title: ${proposal['title']}",
-                    style:
-                        const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text("Event Name: ${proposal['eventName']}",
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text("Description: ${proposal['description']}"),
+                Text("Event Type: ${proposal['eventType']}"),
                 const SizedBox(height: 8),
                 Text("Faculty: ${proposal['faculty']}"),
                 const SizedBox(height: 8),
-                Text("Additional Info: ${proposal['info']}"),
+                Text("Venue: ${proposal['venue']}"),
+                const SizedBox(height: 8),
+                Text("Date: ${proposal['date']}"),
+                const SizedBox(height: 8),
+                Text("Timings: ${proposal['timings']}"),
+                const SizedBox(height: 8),
+                Text("Documents: ${proposal['documents']}"),
               ],
             ),
           ),

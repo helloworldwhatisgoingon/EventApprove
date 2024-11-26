@@ -1,4 +1,5 @@
 # app/routes/event_routes.py
+import traceback
 from flask import Blueprint, request, jsonify
 from ..models import Event
 from .. import db
@@ -9,19 +10,44 @@ bp = Blueprint('event', __name__, url_prefix='/event')
 
 @bp.route('', methods=['POST'])
 def create_event():
-    data = request.json
-    event = Event(
-        eventTitle=data['eventTitle'],
-        eventType=data['eventType'],
-        startDate=data['startDate'],
-        endDate=data['endDate'],
-        location=data['location'],
-        approval=data.get('approval', False)  # Default to False if not provided
-    )
+    try:
+        # Print/log incoming data for debugging
+        print("Form data received:", request.form.to_dict())
+        print("Files received:", request.files.to_dict())
 
-    db.session.add(event)
-    db.session.commit()
-    return jsonify({"message": "Event created", "event": event.to_dict()}), 201
+        # Parse the incoming form data
+        data = request.form
+
+        # Handle the PDF file
+        pdf_file = request.files.get('eventPDF')
+        pdf_content = pdf_file.read() if pdf_file else None
+
+        # Create the Event object
+        event = Event(
+            eventTitle=data['eventTitle'],
+            eventType=data['eventType'],
+            startDate=datetime.strptime(data['startDate'], '%Y-%m-%d').date(),
+            endDate=datetime.strptime(data['endDate'], '%Y-%m-%d').date(),
+            location=data['location'],
+            approval=data.get('approval', 'false').lower() == 'true',
+            eventPDF=pdf_content
+        )
+
+        # Add the event to the database
+        db.session.add(event)
+        db.session.commit()
+
+        return jsonify({"message": "Event created", "event": event.to_dict()}), 201
+
+    except Exception as e:
+        # Print/log the error and the incoming data
+        print("Error occurred while processing the request:")
+        print(traceback.format_exc())  # Logs the full stack trace
+        print("Form data received:", request.form.to_dict())
+        print("Files received:", request.files.to_dict())
+
+        # Return an error response
+        return jsonify({"error": str(e), "message": "Failed to create event"}), 400
 
 @bp.route('/<eventID>', methods=['PUT'])
 def update_event(eventID):
