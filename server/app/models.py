@@ -14,6 +14,8 @@ class Event(db.Model):
     location = db.Column(db.String, nullable=False)
     approval = db.Column(db.Boolean, default=False)
     eventPDF = db.Column(db.LargeBinary, nullable=True)  # New column for storing PDF files
+    timings = db.Column(db.String, nullable=False)
+    faculty = db.Column(db.String, nullable=False)
 
     def to_dict(self):
         return {
@@ -24,5 +26,7 @@ class Event(db.Model):
             'endDate': self.endDate.isoformat(),
             'location': self.location,
             'approval': self.approval,
-            'eventPDF': bool(self.eventPDF)  # Indicates if a PDF is stored
+            'eventPDF': bool(self.eventPDF),  # Indicates if a PDF is stored
+            'timings': self.timings,
+            'faculty': self.faculty,
         }

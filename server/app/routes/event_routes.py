@@ -1,4 +1,5 @@
 # app/routes/event_routes.py
+import base64
 import traceback
 from flask import Blueprint, request, jsonify
 from ..models import Event
@@ -6,9 +7,10 @@ from .. import db
 from datetime import datetime
 from sqlalchemy import text
 
-bp = Blueprint('event', __name__, url_prefix='/event')
+bp = Blueprint("event", __name__, url_prefix="/event")
 
-@bp.route('', methods=['POST'])
+
+@bp.route("", methods=["POST"])
 def create_event():
     try:
         # Print/log incoming data for debugging
@@ -19,18 +21,20 @@ def create_event():
         data = request.form
 
         # Handle the PDF file
-        pdf_file = request.files.get('eventPDF')
+        pdf_file = request.files.get("eventPDF")
         pdf_content = pdf_file.read() if pdf_file else None
 
         # Create the Event object
         event = Event(
-            eventTitle=data['eventTitle'],
-            eventType=data['eventType'],
-            startDate=datetime.strptime(data['startDate'], '%Y-%m-%d').date(),
-            endDate=datetime.strptime(data['endDate'], '%Y-%m-%d').date(),
-            location=data['location'],
-            approval=data.get('approval', 'false').lower() == 'true',
-            eventPDF=pdf_content
+            eventTitle=data["eventTitle"],
+            eventType=data["eventType"],
+            startDate=datetime.strptime(data["startDate"], "%Y-%m-%d").date(),
+            endDate=datetime.strptime(data["endDate"], "%Y-%m-%d").date(),
+            location=data["location"],
+            approval=data.get("approval", "false").lower() == "true",
+            eventPDF=pdf_content,
+            timings=data["timings"],
+            faculty=data["faculty"],
         )
 
         # Add the event to the database
@@ -49,39 +53,71 @@ def create_event():
         # Return an error response
         return jsonify({"error": str(e), "message": "Failed to create event"}), 400
 
-@bp.route('/<eventID>', methods=['PUT'])
+
+@bp.route("/<eventID>", methods=["PUT"])
 def update_event(eventID):
     data = request.json
     event = Event.query.get(eventID)
     if not event:
         return jsonify({"error": "Event not found"}), 404
-    
-    event.eventTitle = data.get('eventTitle', event.eventTitle)
-    event.eventType = data.get('eventType', event.eventType)
-    event.startDate = datetime.strptime(data['startDate'], '%Y-%m-%d').date() if 'startDate' in data else event.startDate
-    event.endDate = datetime.strptime(data['endDate'], '%Y-%m-%d').date() if 'endDate' in data else event.endDate
-    event.location = data.get('location', event.location)
-    event.approval = data.get('approval', event.approval)
-    
+
+    event.eventTitle = data.get("eventTitle", event.eventTitle)
+    event.eventType = data.get("eventType", event.eventType)
+    event.startDate = (
+        datetime.strptime(data["startDate"], "%Y-%m-%d").date()
+        if "startDate" in data
+        else event.startDate
+    )
+    event.endDate = (
+        datetime.strptime(data["endDate"], "%Y-%m-%d").date()
+        if "endDate" in data
+        else event.endDate
+    )
+    event.location = data.get("location", event.location)
+    event.approval = data.get("approval", event.approval)
+
     db.session.commit()
     return jsonify({"message": "Event updated", "event": event.to_dict()}), 200
 
-@bp.route('/<eventID>/approval', methods=['PUT'])
+
+@bp.route("/<eventID>/approval", methods=["PUT"])
 def update_approval(eventID):
     data = request.json
     event = Event.query.get(eventID)
     if not event:
         return jsonify({"error": "Event not found"}), 404
-    
-    event.approval = data['approval']
-    db.session.commit()
-    return jsonify({"message": "Approval status updated", "approval": event.approval}), 200
 
-@bp.route('', methods=['GET'])
+    event.approval = data["approval"]
+    db.session.commit()
+    return (
+        jsonify({"message": "Approval status updated", "approval": event.approval}),
+        200,
+    )
+
+
+@bp.route("", methods=["GET"])
 def get_all_events():
-    # Using ORM to get all events
-    events = Event.query.all()
-    return jsonify([event.to_dict() for event in events]), 200
+    try:
+        events = Event.query.all()
+        events_list = []
+
+        for event in events:
+            event_data = event.to_dict()
+            # Encode the file as base64
+            if event.eventPDF:
+                event_data["eventPDF"] = base64.b64encode(event.eventPDF).decode(
+                    "utf-8"
+                )
+            else:
+                event_data["eventPDF"] = None
+
+            events_list.append(event_data)
+
+        return jsonify({"events": events_list}), 200
+
+    except Exception as e:
+        print("Error fetching events:", str(e))
+        return jsonify({"error": str(e), "message": "Failed to fetch events"}), 500
 
     # # Using raw SQL (for easier understanding)
     # query = text('SELECT * FROM "Event"')
@@ -102,12 +138,13 @@ def get_all_events():
 
     # return jsonify(events), 200
 
-@bp.route('/<eventID>', methods=['DELETE'])
+
+@bp.route("/<eventID>", methods=["DELETE"])
 def delete_event(eventID):
     event = Event.query.get(eventID)
     if not event:
         return jsonify({"error": "Event not found"}), 404
-    
+
     db.session.delete(event)
     db.session.commit()
     return jsonify({"message": "Event deleted"}), 200

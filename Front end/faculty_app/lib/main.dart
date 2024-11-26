@@ -1,9 +1,11 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date formatting
 import 'package:file_picker/file_picker.dart'; // For file picking
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 void main() {
   runApp(const DashboardApp());
@@ -16,6 +18,7 @@ class DashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'DSU-QuickApprove',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -152,7 +155,6 @@ class CreateProposalPage extends StatefulWidget {
 }
 
 class _CreateProposalPageState extends State<CreateProposalPage> {
-  static List<Map<String, dynamic>> proposals = [];
   int _currentStep = 0;
 
   final List<String> _stepsQuestions = [
@@ -217,6 +219,8 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         location: _currentProposal['venue'] ?? "",
         approval: false,
         documentPath: _currentProposal['document'],
+        faculty: _currentProposal['faculty'],
+        timings: _currentProposal['timings'],
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -274,7 +278,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () => _pickDate(context),
-              child: const Text("Pick Date"),
+              child: const Text("Pick Date: "),
             ),
           ),
         if (_currentStep == 5) // Timings step
@@ -354,42 +358,141 @@ class ProposalStepsWidget extends StatelessWidget {
   }
 }
 
-class ViewSubmissionsPage extends StatelessWidget {
+class ViewSubmissionsPage extends StatefulWidget {
   const ViewSubmissionsPage({super.key});
 
   @override
+  _ViewSubmissionsPageState createState() => _ViewSubmissionsPageState();
+}
+
+class _ViewSubmissionsPageState extends State<ViewSubmissionsPage> {
+  late Future<List<Map<String, dynamic>>> proposalsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    proposalsFuture = repository.fetchProposals(); // Initial data load
+  }
+
+  Future<void> _viewDocument(String base64PDF, String fileName) async {
+    try {
+      // Decode the Base64 string to bytes
+      Uint8List bytes = base64Decode(base64PDF);
+
+      // Get the Downloads directory
+      final downloadsDir = await getDownloadsDirectory();
+      if (downloadsDir == null) {
+        throw 'Downloads directory not found';
+      }
+
+      // Create a file path in the Downloads directory
+      final filePath = '${downloadsDir.path}/$fileName.pdf';
+
+      // Write the bytes to a file
+      final file = File(filePath);
+      await file.writeAsBytes(bytes);
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File saved to Downloads: $fileName.pdf')),
+      );
+    } catch (e) {
+      debugPrint('Error viewing document: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving document: $e')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: _CreateProposalPageState.proposals.map((proposal) {
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Event Name: ${proposal['eventName']}",
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Text("Event Type: ${proposal['eventType']}"),
-                const SizedBox(height: 8),
-                Text("Faculty: ${proposal['faculty']}"),
-                const SizedBox(height: 8),
-                Text("Venue: ${proposal['venue']}"),
-                const SizedBox(height: 8),
-                Text("Date: ${proposal['date']}"),
-                const SizedBox(height: 8),
-                Text("Timings: ${proposal['timings']}"),
-                const SizedBox(height: 8),
-                Text("Documents: ${proposal['documents']}"),
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('View Submissions'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                proposalsFuture =
+                    repository.fetchProposals(); // Reload the data
+              });
+            },
           ),
-        );
-      }).toList(),
+        ],
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: proposalsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No submissions found.'));
+          }
+
+          final proposals = snapshot.data!;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: proposals.length,
+            itemBuilder: (context, index) {
+              final proposal = proposals[index];
+
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Event Name: ${proposal['eventTitle'] ?? 'N/A'}",
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text("Event Type: ${proposal['eventType'] ?? 'N/A'}"),
+                      const SizedBox(height: 8),
+                      Text("Faculty: ${proposal['faculty'] ?? 'N/A'}"),
+                      const SizedBox(height: 8),
+                      Text("Venue: ${proposal['location'] ?? 'N/A'}"),
+                      const SizedBox(height: 8),
+                      Text("Date: ${proposal['startDate'] ?? 'N/A'}"),
+                      const SizedBox(height: 8),
+                      Text("Timings: ${proposal['timings'] ?? 'N/A'}"),
+                      const SizedBox(height: 8),
+                      // Display a button for viewing the document
+                      if (proposal['eventPDF'] != null)
+                        TextButton(
+                          onPressed: () {
+                            final base64PDF = proposal['eventPDF'];
+                            _viewDocument(base64PDF,
+                                proposal['eventTitle'] ?? 'document');
+                          },
+                          child: const Text('Save Document to Downloads'),
+                        )
+                      else
+                        const Text('Document not available'),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
+  }
+
+  Future<Directory?> getDownloadsDirectory() async {
+    if (Platform.isWindows) {
+      return Directory('${Platform.environment['USERPROFILE']}\\Downloads');
+    } else if (Platform.isLinux || Platform.isMacOS) {
+      return Directory('${Platform.environment['HOME']}/Downloads');
+    }
+    return null;
   }
 }
 

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:faculty_app/config.dart';
+import 'package:flutter/foundation.dart';
 
 class Repository {
   Config config = Config();
@@ -12,6 +13,8 @@ class Repository {
     required String startDate,
     required String endDate,
     required String location,
+    required String faculty,
+    required String timings,
     required bool approval,
     String? documentPath,
   }) async {
@@ -24,6 +27,8 @@ class Repository {
         "eventType": eventType,
         "startDate": startDate,
         "endDate": endDate,
+        "timings": timings,
+        "faculty": faculty,
         "location": location,
         "approval": approval,
         if (documentPath != null)
@@ -46,6 +51,21 @@ class Repository {
       }
     } catch (e) {
       rethrow; // Pass the exception back to the caller for handling
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchProposals() async {
+    try {
+      final String endpoint = "${config.baseURL}/event";
+      final response = await Dio().get(endpoint);
+      final List eventsJson = response.data['events'];
+
+      return eventsJson.map((json) => json as Map<String, dynamic>).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching events: $e");
+      }
+      rethrow;
     }
   }
 }
