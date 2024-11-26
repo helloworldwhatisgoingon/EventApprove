@@ -48,4 +48,22 @@ class Repository {
       throw Exception('Error during PUT request: $e');
     }
   }
+
+  Future<Map<String, dynamic>> deleteRequest(int eventID) async {
+    final url = '${config.baseURL}/event/$eventID';
+
+    try {
+      final response = await dio.delete(url);
+
+      if (response.statusCode == 200) {
+        // If the server returns a 200 OK response, parse the response.
+        return response.data;
+      } else {
+        // If the server returns a non-200 response, throw an error
+        throw Exception('Failed to update request status');
+      }
+    } catch (e) {
+      throw Exception('Error during PUT request: $e');
+    }
+  }
 }

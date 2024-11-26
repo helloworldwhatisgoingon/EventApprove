@@ -222,7 +222,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 );
                               },
                               onDelete: () {
-                                _deleteRequest(request, currentRequests);
+                                repository.deleteRequest(request['eventID']);
+                                _refreshRequests();
                               },
                               isInbox: _selectedIndex == 0,
                             );
