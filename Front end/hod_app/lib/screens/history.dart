@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'event.dart'; // Import EventScreen
 
 class HistoryScreen extends StatefulWidget {
-  final List<Map<String, String>> events;
+  final List<Map<String, dynamic>> events;
 
   const HistoryScreen({super.key, required this.events});
 
@@ -13,7 +13,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   DateTime? selectedDate;
-  List<Map<String, String>> filteredEvents = [];
+  List<Map<String, dynamic>> filteredEvents = [];
 
   void _filterEvents(DateTime date) {
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);

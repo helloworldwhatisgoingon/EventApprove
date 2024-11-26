@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/repository.dart';
 import 'screens/event.dart';
 import 'screens/history.dart';
 
@@ -6,12 +7,15 @@ void main() {
   runApp(const DashboardApp());
 }
 
+Repository repository = Repository();
+
 class DashboardApp extends StatelessWidget {
   const DashboardApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'DSU-QuickApprove',
       theme: ThemeData(
         primaryColor: const Color(0xff2f3652),
@@ -32,180 +36,13 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
-  final List<Map<String, String>> _requests = [
-    {
-      "title": "Event 1",
-      "type": "Workshop",
-      "faculty": "Dr. Smith",
-      "venue": "Room A",
-      "date": "2024-09-30",
-      "time": "10:00 AM"
-    },
-    {
-      "title": "Event 2",
-      "type": "Seminar",
-      "faculty": "Dr. Johnson",
-      "venue": "Room B",
-      "date": "2024-10-05",
-      "time": "2:00 PM"
-    },
-    {
-      "title": "Event 3",
-      "type": "Conference",
-      "faculty": "Dr. Lee",
-      "venue": "Room C",
-      "date": "2024-10-15",
-      "time": "9:00 AM"
-    },
-    {
-      "title": "Event 4",
-      "type": "Lecture",
-      "faculty": "Dr. Evans",
-      "venue": "Room D",
-      "date": "2024-10-18",
-      "time": "11:00 AM"
-    },
-    {
-      "title": "Event 5",
-      "type": "Workshop",
-      "faculty": "Prof. Robinson",
-      "venue": "Room E",
-      "date": "2024-10-20",
-      "time": "3:00 PM"
-    },
-    {
-      "title": "Event 6",
-      "type": "Meeting",
-      "faculty": "Dr. Kim",
-      "venue": "Room F",
-      "date": "2024-10-25",
-      "time": "10:00 AM"
-    },
-    {
-      "title": "Event 7",
-      "type": "Seminar",
-      "faculty": "Dr. Brown",
-      "venue": "Room G",
-      "date": "2024-10-28",
-      "time": "1:00 PM"
-    },
-    {
-      "title": "Event 8",
-      "type": "Panel Discussion",
-      "faculty": "Prof. Garcia",
-      "venue": "Room H",
-      "date": "2024-11-01",
-      "time": "4:00 PM"
-    },
-    {
-      "title": "Event 9",
-      "type": "Lecture",
-      "faculty": "Dr. Wilson",
-      "venue": "Room I",
-      "date": "2024-11-03",
-      "time": "11:30 AM"
-    },
-    {
-      "title": "Event 10",
-      "type": "Conference",
-      "faculty": "Dr. Martinez",
-      "venue": "Room J",
-      "date": "2024-11-07",
-      "time": "9:30 AM"
-    },
-    {
-      "title": "Event 11",
-      "type": "Workshop",
-      "faculty": "Prof. Clark",
-      "venue": "Room K",
-      "date": "2024-11-10",
-      "time": "2:30 PM"
-    },
-    {
-      "title": "Event 12",
-      "type": "Seminar",
-      "faculty": "Dr. Lewis",
-      "venue": "Room L",
-      "date": "2024-11-12",
-      "time": "10:00 AM"
-    },
-    {
-      "title": "Event 13",
-      "type": "Panel Discussion",
-      "faculty": "Prof. Young",
-      "venue": "Room M",
-      "date": "2024-11-15",
-      "time": "5:00 PM"
-    },
-    {
-      "title": "Event 14",
-      "type": "Lecture",
-      "faculty": "Dr. King",
-      "venue": "Room N",
-      "date": "2024-11-18",
-      "time": "12:00 PM"
-    },
-    {
-      "title": "Event 15",
-      "type": "Workshop",
-      "faculty": "Prof. Wright",
-      "venue": "Room O",
-      "date": "2024-11-20",
-      "time": "3:00 PM"
-    },
-    {
-      "title": "Event 16",
-      "type": "Meeting",
-      "faculty": "Dr. Lopez",
-      "venue": "Room P",
-      "date": "2024-11-22",
-      "time": "10:30 AM"
-    },
-    {
-      "title": "Event 17",
-      "type": "Seminar",
-      "faculty": "Dr. Hill",
-      "venue": "Room Q",
-      "date": "2024-11-25",
-      "time": "1:30 PM"
-    },
-    {
-      "title": "Event 18",
-      "type": "Conference",
-      "faculty": "Prof. Scott",
-      "venue": "Room R",
-      "date": "2024-11-28",
-      "time": "9:00 AM"
-    },
-    {
-      "title": "Event 19",
-      "type": "Lecture",
-      "faculty": "Dr. Green",
-      "venue": "Room S",
-      "date": "2024-11-30",
-      "time": "11:15 AM"
-    },
-    {
-      "title": "Event 20",
-      "type": "Workshop",
-      "faculty": "Prof. Adams",
-      "venue": "Room T",
-      "date": "2024-12-02",
-      "time": "4:00 PM"
-    }
-  ];
+  Future<List<Map<String, dynamic>>>? _futureRequests;
 
-  void _navigateToHistoryScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HistoryScreen(events: _requests),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _futureRequests = repository.fetchProposals();
   }
-
-  final List<Map<String, String>> _acceptedRequests = [];
-  final List<Map<String, String>> _rejectedRequests = [];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -213,124 +50,198 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  Future<void> _showCalendar(BuildContext context) async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
+  void _refreshRequests() {
+    setState(() {
+      _futureRequests = repository.fetchProposals();
+    });
+  }
+
+  void _navigateToHistoryScreen(
+      BuildContext context, List<Map<String, dynamic>> requests) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HistoryScreen(events: requests),
+      ),
     );
-    if (selectedDate != null) {
-      print("Selected date: ${selectedDate.toLocal()}");
+  }
+
+  Future<void> acceptOrReject(int eventID, bool status) async {
+    try {
+      // Call the API function to update the request status
+      await repository.updateRequestStatus(eventID, status);
+
+      // Refresh the page after successful status update
+      _refreshRequests();
+    } catch (e) {
+      // Handle any errors during the update
+      debugPrint('Error updating request status: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status: $e')),
+      );
     }
   }
 
-  void _acceptRequest(Map<String, String> request) {
+  void _acceptRequest(
+      Map<String, dynamic> request,
+      List<Map<String, dynamic>> currentRequests,
+      List<Map<String, dynamic>> acceptedRequests) {
     setState(() {
-      _requests.remove(request);
-      _acceptedRequests.add(request);
+      currentRequests.remove(request);
+      acceptedRequests.add(request);
     });
   }
 
-  void _rejectRequest(Map<String, String> request) {
+  void _rejectRequest(
+      Map<String, dynamic> request,
+      List<Map<String, dynamic>> currentRequests,
+      List<Map<String, dynamic>> rejectedRequests) {
     setState(() {
-      _requests.remove(request);
-      _rejectedRequests.add(request);
+      currentRequests.remove(request);
+      rejectedRequests.add(request);
     });
   }
 
-  void _deleteRequest(Map<String, String> request, int tab) {
+  void _deleteRequest(
+      Map<String, dynamic> request, List<Map<String, dynamic>> targetList) {
     setState(() {
-      if (tab == 1) {
-        _acceptedRequests.remove(request);
-      } else if (tab == 2) {
-        _rejectedRequests.remove(request);
-      }
+      targetList.remove(request);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, String>> currentRequests;
-    switch (_selectedIndex) {
-      case 1:
-        currentRequests = _acceptedRequests;
-        break;
-      case 2:
-        currentRequests = _rejectedRequests;
-        break;
-      default:
-        currentRequests = _requests;
-    }
-
     return Scaffold(
-      body: Row(
-        children: [
-          // Sidebar
-          Container(
-            width: 250,
-            color: const Color(0xff2f3652),
-            child: Column(
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _futureRequests,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No requests available.'));
+          } else {
+            // All requests
+            final List<Map<String, dynamic>> requests = snapshot.data!;
+
+            // Filtered requests based on approval status
+            final List<Map<String, dynamic>> acceptedRequests = requests
+                .where((request) => request['approval'] == true)
+                .toList();
+
+            final List<Map<String, dynamic>> rejectedRequests = requests
+                .where((request) => request['approval'] == false)
+                .toList();
+
+            final List<Map<String, dynamic>> neutralRequests = requests
+                .where((request) => request['approval'] == null)
+                .toList();
+
+            // Determine the current view based on the selected index
+            List<Map<String, dynamic>> currentRequests;
+            switch (_selectedIndex) {
+              case 1: // Accepted Requests
+                currentRequests = acceptedRequests;
+                break;
+              case 2: // Rejected Requests
+                currentRequests = rejectedRequests;
+                break;
+              default: // Inbox (Unfiltered)
+                currentRequests = neutralRequests;
+            }
+
+            return Row(
               children: [
-                const SizedBox(height: 30),
-                const Text(
-                  'DSU-QuickApprove',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                // Sidebar
+                Container(
+                  width: 250,
+                  color: const Color(0xff2f3652),
+                  child: Column(
                     children: [
-                      SidebarButton(
-                          text: 'Inbox', onPressed: () => _onItemTapped(0)),
-                      SidebarButton(
-                          text: 'Accepted', onPressed: () => _onItemTapped(1)),
-                      SidebarButton(
-                          text: 'Rejected', onPressed: () => _onItemTapped(2)),
-                      SidebarButton(
-                        text: 'Calendar',
-                        onPressed: () => _navigateToHistoryScreen(context),
+                      const SizedBox(height: 30),
+                      const Text(
+                        'DSU-QuickApprove',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          children: [
+                            SidebarButton(
+                                text: 'Inbox',
+                                onPressed: () => _onItemTapped(0)),
+                            SidebarButton(
+                                text: 'Accepted',
+                                onPressed: () => _onItemTapped(1)),
+                            SidebarButton(
+                                text: 'Rejected',
+                                onPressed: () => _onItemTapped(2)),
+                            SidebarButton(
+                              text: 'Calendar',
+                              onPressed: () =>
+                                  _navigateToHistoryScreen(context, requests),
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _refreshRequests,
+                              child: const Text('Refresh'),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
+                // Main Content
+                Expanded(
+                  child: currentRequests.isNotEmpty
+                      ? ListView.builder(
+                          padding: const EdgeInsets.all(20),
+                          itemCount: currentRequests.length,
+                          itemBuilder: (context, index) {
+                            final request = currentRequests[index];
+                            return TaskCard(
+                              request: request,
+                              onAccept: () async {
+                                await acceptOrReject(
+                                  request['eventID'],
+                                  true,
+                                );
+                              },
+                              onReject: () async {
+                                await acceptOrReject(
+                                  request['eventID'],
+                                  false,
+                                );
+                              },
+                              onDelete: () {
+                                _deleteRequest(request, currentRequests);
+                              },
+                              isInbox: _selectedIndex == 0,
+                            );
+                          },
+                        )
+                      : Center(
+                          child: Text(
+                            _selectedIndex == 1
+                                ? 'No accepted requests.'
+                                : _selectedIndex == 2
+                                    ? 'No rejected requests.'
+                                    : 'No new requests.',
+                          ),
+                        ),
+                ),
               ],
-            ),
-          ),
-          // Main Content
-          Expanded(
-            child: currentRequests.isNotEmpty
-                ? ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: currentRequests.length,
-                    itemBuilder: (context, index) {
-                      final request = currentRequests[index];
-                      return TaskCard(
-                        request: request,
-                        onAccept: () => _acceptRequest(request),
-                        onReject: () => _rejectRequest(request),
-                        onDelete: () => _deleteRequest(request, _selectedIndex),
-                        isInbox: _selectedIndex == 0,
-                      );
-                    },
-                  )
-                : Center(
-                    child: Text(
-                      _selectedIndex == 1
-                          ? 'No accepted requests.'
-                          : _selectedIndex == 2
-                              ? 'No rejected requests.'
-                              : 'No new requests.',
-                    ),
-                  ),
-          ),
-        ],
+            );
+          }
+        },
       ),
     );
   }
@@ -340,7 +251,7 @@ class SidebarButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
 
-  SidebarButton({super.key, required this.text, required this.onPressed});
+  const SidebarButton({super.key, required this.text, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -359,13 +270,14 @@ class SidebarButton extends StatelessWidget {
 }
 
 class TaskCard extends StatelessWidget {
-  final Map<String, String> request;
+  final Map<String, dynamic> request;
   final VoidCallback onAccept;
   final VoidCallback onReject;
   final VoidCallback onDelete;
   final bool isInbox;
 
-  TaskCard({super.key, 
+  const TaskCard({
+    super.key,
     required this.request,
     required this.onAccept,
     required this.onReject,
@@ -383,7 +295,7 @@ class TaskCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              request["title"]!,
+              request["eventTitle"] ?? 'N/A',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -392,11 +304,11 @@ class TaskCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              "Type: ${request['type']}\n"
+              "Type: ${request['eventType']}\n"
               "Faculty: ${request['faculty']}\n"
-              "Venue: ${request['venue']}\n"
-              "Date: ${request['date']}\n"
-              "Time: ${request['time']}",
+              "Venue: ${request['location']}\n"
+              "Date: ${request['startDate']}\n"
+              "Time: ${request['timings']}",
               style: const TextStyle(fontSize: 14, color: Color(0xff9da6c4)),
             ),
             const SizedBox(height: 10),

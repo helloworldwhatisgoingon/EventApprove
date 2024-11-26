@@ -80,7 +80,7 @@ def update_event(eventID):
     return jsonify({"message": "Event updated", "event": event.to_dict()}), 200
 
 
-@bp.route("/<eventID>/approval", methods=["PUT"])
+@bp.route("/approval/<eventID>", methods=["PUT"])
 def update_approval(eventID):
     data = request.json
     event = Event.query.get(eventID)
@@ -137,6 +137,42 @@ def get_all_events():
     #     events.append(event)
 
     # return jsonify(events), 200
+
+@bp.route("/by-date", methods=["GET"])
+def get_events_by_start_date():
+    try:
+        # Retrieve the 'startDate' query parameter
+        start_date = request.args.get("startDate")
+        if not start_date:
+            return jsonify({"error": "startDate query parameter is required"}), 400
+
+        # Parse the startDate into a datetime object for filtering
+        try:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        except ValueError:
+            return jsonify({"error": "Invalid startDate format. Use YYYY-MM-DD."}), 400
+
+        # Query events with a matching or greater startDate
+        events = Event.query.filter(Event.startDate >= start_date).all()
+        events_list = []
+
+        for event in events:
+            event_data = event.to_dict()
+            # Encode the file as base64
+            if event.eventPDF:
+                event_data["eventPDF"] = base64.b64encode(event.eventPDF).decode(
+                    "utf-8"
+                )
+            else:
+                event_data["eventPDF"] = None
+
+            events_list.append(event_data)
+
+        return jsonify({"events": events_list}), 200
+
+    except Exception as e:
+        print("Error fetching events by startDate:", str(e))
+        return jsonify({"error": str(e), "message": "Failed to fetch events"}), 500
 
 
 @bp.route("/<eventID>", methods=["DELETE"])
