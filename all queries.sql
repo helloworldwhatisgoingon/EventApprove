@@ -12,6 +12,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO Punith;
 CREATE TABLE EventsOrganized (
     id VARCHAR PRIMARY KEY
 );
+
 CREATE TABLE Workshop (
     workshopTitle VARCHAR,
     type VARCHAR CHECK (type IN ('Online', 'Offline')),
@@ -31,6 +32,7 @@ CREATE TABLE Workshop (
     expenditureReport BYTEA,
     speakerDetails VARCHAR
 );
+
 CREATE TABLE FDP (
     fdpTitle VARCHAR,
     type VARCHAR CHECK (type IN ('Online', 'Offline')),
@@ -51,6 +53,7 @@ CREATE TABLE FDP (
     speakerDetails VARCHAR,
     sponsorship VARCHAR
 );
+
 CREATE TABLE Seminar (
     seminarTitle VARCHAR,
     type VARCHAR CHECK (type IN ('Online', 'Offline')),
@@ -70,6 +73,7 @@ CREATE TABLE Seminar (
     expenditureReport BYTEA,
     speakerDetails VARCHAR
 );
+
 CREATE TABLE Conference (
     conferenceTitle VARCHAR,
     theme VARCHAR,
@@ -93,6 +97,7 @@ CREATE TABLE Conference (
     speakerDetails VARCHAR,
     sponsorship VARCHAR
 );
+
 CREATE TABLE ClubActivity (
     clubName VARCHAR,
     activityType VARCHAR CHECK (activityType IN ('Workshop', 'Boot Camp', 'Seminar', 'Quiz', 'Hackathon')),
@@ -111,76 +116,6 @@ CREATE TABLE ClubActivity (
     speakerDetails VARCHAR
 );
 
-
-
-INSERT INTO Workshop (
-    workshopTitle,
-    type,
-    brochure,
-    startDate,
-    endDate,
-    numberOfDays,
-    gpsPhotos,
-    report,
-    organizers,
-    conveners,
-    feedback,
-    participantsList,
-    certificates,
-    amountSanctioned,
-    facultyReceivingSanctionedAmount,
-    expenditureReport,
-    speakerDetails
-)
-VALUES (
-    'Advanced Python Workshop',
-    'Online',
-    pg_read_binary_file('C:/Users/USER/OneDrive/Documents/sample_1.pdf'),  -- PDF file path for brochure
-    '2024-11-01',  -- Start Date
-    '2024-11-05',  -- End Date
-    5,  -- Number of Days
-    pg_read_binary_file('C:/Users/USER/OneDrive/Documents/sample_1.pdf'),  -- Image file path for GPS photo
-    pg_read_binary_file('C:/Users/USER/OneDrive/Documents/sample_1.pdf'),  -- PDF file path for report
-    'John Doe, Jane Smith',  -- Organizers
-    'Dr. Emily Clark',  -- Conveners
-    pg_read_binary_file('C:/Users/USER/OneDrive/Documents/sample_1.pdf'),  -- PDF file path for certificates
-    pg_read_binary_file('C:/Users/USER/OneDrive/Documents/sample_1.pdf'),
-	pg_read_binary_file('C:/Users/USER/OneDrive/Documents/sample_1.pdf'),
-	5000.00,  -- Amount Sanctioned
-    'Dr. Emily Clark',  -- Faculty Receiving Sanctioned Amount
-    pg_read_binary_file('C:/Users/USER/OneDrive/Documents/sample_1.pdf')
-,  -- PDF file path for expenditure report
-    'Prof. John Watson, Dr. Emily Clark'  -- Speaker Details
-);
-
-
-
-SELECT
-    workshopTitle,
-    type,
-    startDate,
-    endDate,
-    numberOfDays,
-    gpsPhotos,
-    brochure,
-    report,
-    organizers,
-    conveners,
-    feedback,
-    participantsList,
-    certificates,
-    amountSanctioned,
-    facultyReceivingSanctionedAmount,
-    expenditureReport,
-    speakerDetails
-FROM Workshop
-WHERE workshopTitle = 'Advanced Python Workshop';
-
-SELECT brochure
-FROM Workshop
-WHERE workshopTitle = 'Advanced Python Workshop';
-
--- Change this as you like
 CREATE TABLE "Event" (
     "eventID" SERIAL PRIMARY KEY,
     "eventTitle" VARCHAR(100) NOT NULL,
@@ -190,3 +125,15 @@ CREATE TABLE "Event" (
     "location" VARCHAR(100) NOT NULL,
     "approval" BOOLEAN DEFAULT FALSE
 );
+
+ALTER TABLE "Event"
+ADD COLUMN "Faculty involved" VARCHAR(255);
+
+ALTER TABLE "Event"
+RENAME COLUMN "Faculty involved" TO "faculty";
+
+ALTER TABLE "Event"
+ALTER COLUMN "approval" SET DEFAULT NULL;
+
+UPDATE "Event"
+SET "approval"=NULL;
