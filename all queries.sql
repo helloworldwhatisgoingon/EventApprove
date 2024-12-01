@@ -123,17 +123,6 @@ CREATE TABLE "Event" (
     "startDate" DATE NOT NULL,
     "endDate" DATE NOT NULL,
     "location" VARCHAR(100) NOT NULL,
-    "approval" BOOLEAN DEFAULT FALSE
+    "approval" BOOLEAN DEFAULT NULL,
+    "faculty" VARCHAR(255)
 );
-
-ALTER TABLE "Event"
-ADD COLUMN "Faculty involved" VARCHAR(255);
-
-ALTER TABLE "Event"
-RENAME COLUMN "Faculty involved" TO "faculty";
-
-ALTER TABLE "Event"
-ALTER COLUMN "approval" SET DEFAULT NULL;
-
-UPDATE "Event"
-SET "approval"=NULL;
