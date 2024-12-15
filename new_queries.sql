@@ -11,8 +11,7 @@ CREATE TABLE conference (
     doiIsbn VARCHAR(100),
     document BYTEA DEFAULT NULL,
     proofLink VARCHAR(255),
-    identifier SERIAL,
-	approval BOOLEAN DEFAULT NULL
+	   approval BOOLEAN DEFAULT NULL
 );
 
 
