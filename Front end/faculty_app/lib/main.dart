@@ -1,30 +1,86 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-
-import 'package:faculty_app/repository.dart';
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart'; // For file picking
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+
+import 'package:faculty_app/repository.dart';
+import 'package:flutter/material.dart';
+import 'screens/IAmarksCP.dart';
+import 'screens/BookChapterCP.dart';
+import 'screens/ClubActivitiesCP.dart';
+import 'screens/ConferencesCP.dart';
+import 'screens/EventsCP.dart';
+import 'screens/FDCP.dart';
+import 'screens/FacultyAchievementsCP.dart';
+import 'screens/IndustrialVisitsCP.dart';
+import 'screens/JournalsCP.dart';
+import 'screens/PatentsCP.dart';
+import 'screens/ProfessionalSocietiesCP.dart';
+import 'screens/SeminarsCP.dart';
+import 'screens/StudentAchievementsCP.dart';
+import 'screens/UnknownEventPage.dart';
+import 'screens/WorkshopCP.dart';
+import 'screens/settings.dart';
+
+Repository repository = Repository();
 
 void main() {
   runApp(const DashboardApp());
 }
 
-Repository repository = Repository();
-
 class DashboardApp extends StatelessWidget {
   const DashboardApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'DSU-QuickApprove',
+      title: 'DSU-EventApprove',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: const Color(0xfff8f9fd),
       ),
-      home: const HomePage(),
+      home: const SplashScreen(),
+    );
+  }
+}
+
+// Splash Screen with animation
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: AnimatedOpacity(
+          opacity: 1.0,
+          duration: const Duration(seconds: 2),
+          child: const Text(
+            'Welcome to DSU-EventApprove!',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -37,36 +93,116 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const CreateProposalPage(),
-    const ViewSubmissionsPage(),
-    const SettingsPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          Sidebar(onSelectedIndexChanged: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          }),
-          Expanded(child: _pages[_currentIndex]),
+          Sidebar(),
+          Expanded(
+            child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: GridView.count(
+                  crossAxisCount: 5,
+                  mainAxisSpacing: 15,
+                  crossAxisSpacing: 15,
+                  children: [
+                    buildCategoryCard("IA Marks", Icons.school),
+                    buildCategoryCard("Conferences", Icons.business),
+                    buildCategoryCard("Journals", Icons.book),
+                    buildCategoryCard(
+                        "Book- chapter/Published", Icons.menu_book),
+                    buildCategoryCard("Patents", Icons.lightbulb),
+                    buildCategoryCard("Events", Icons.event),
+                    buildCategoryCard("Workshops", Icons.work),
+                    buildCategoryCard("FDP", Icons.people),
+                    buildCategoryCard("Seminars/Webinars", Icons.web),
+                    buildCategoryCard("Club Activities", Icons.group),
+                    buildCategoryCard("Industrial Visits", Icons.factory),
+                    buildCategoryCard("Faculty Major Achievements", Icons.star),
+                    buildCategoryCard(
+                        "Student Major Achievements", Icons.emoji_events),
+                    buildCategoryCard("Professional Societies activities",
+                        Icons.account_balance),
+                  ],
+                )),
+          ),
         ],
       ),
     );
   }
+
+  Widget buildCategoryCard(String label, IconData icon) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      color: const Color(0xff405375),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => getPageForEvent(label)),
+          );
+        },
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white, size: 40),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget getPageForEvent(String eventType) {
+    switch (eventType) {
+      case "IA Marks":
+        return const IAmarksCP();
+      case "Conferences":
+        return const ConferencesCP();
+      case "Journals":
+        return const JournalsCP();
+      case "Book- chapter/Published":
+        return const BookChapterCP();
+      case "Patents":
+        return const PatentsCP();
+      case "Events":
+        return const EventsCP();
+      case "Workshops":
+        return const WorkshopsCP();
+      case "FDP":
+        return const FDPCP();
+      case "Seminars/Webinars":
+        return const SeminarsCP();
+      case "Club Activities":
+        return const ClubActivitiesCP();
+      case "Industrial Visits":
+        return const IndustrialVisitsCP();
+      case "Faculty Major Achievements":
+        return const FacultyAchievementsCP();
+      case "Student Major Achievements":
+        return const StudentAchievementsCP();
+      case "Professional Societies activities":
+        return const ProfessionalSocietiesCP();
+      default:
+        return const UnknownEventPage();
+    }
+  }
 }
 
 class Sidebar extends StatelessWidget {
-  final ValueChanged<int> onSelectedIndexChanged;
-
-  const Sidebar({super.key, required this.onSelectedIndexChanged});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -77,26 +213,47 @@ class Sidebar extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(20.0),
             child: Text(
-              'DSU-QuickApprove',
+              'DSU-EventApprove',
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
           SidebarButton(
-              label: "Home", index: 0, onPressed: onSelectedIndexChanged),
+            icon: Icons.dashboard,
+            label: "Dashboard",
+            onTap: () {},
+          ),
           SidebarButton(
-              label: "Create Proposal",
-              index: 1,
-              onPressed: onSelectedIndexChanged),
+            icon: Icons.create,
+            label: "Create Proposal",
+            onTap: () {},
+          ),
           SidebarButton(
-              label: "View Submissions",
-              index: 2,
-              onPressed: onSelectedIndexChanged),
+            icon: Icons.list_alt,
+            label: "View Submissions",
+            onTap: () {
+              print('tapped');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ViewSubmissionsPage()),
+              );
+            },
+          ),
           SidebarButton(
-              label: "Settings", index: 3, onPressed: onSelectedIndexChanged),
+            icon: Icons.settings,
+            label: "Settings",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -104,254 +261,34 @@ class Sidebar extends StatelessWidget {
 }
 
 class SidebarButton extends StatelessWidget {
+  final IconData icon;
   final String label;
-  final int index;
-  final ValueChanged<int> onPressed;
+  final VoidCallback onTap;
 
-  const SidebarButton(
-      {super.key,
-      required this.label,
-      required this.index,
-      required this.onPressed});
+  const SidebarButton({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ElevatedButton(
-        onPressed: () => onPressed(index),
+      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 20.0),
+      child: ElevatedButton.icon(
+        onPressed: onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xff405375),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         ),
-        child: Text(label,
-            style: const TextStyle(color: Colors.white, fontSize: 16)),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Welcome to DSU-QuickApprove!',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
-
-class CreateProposalPage extends StatefulWidget {
-  const CreateProposalPage({super.key});
-
-  @override
-  _CreateProposalPageState createState() => _CreateProposalPageState();
-}
-
-class _CreateProposalPageState extends State<CreateProposalPage> {
-  int _currentStep = 0;
-
-  final List<String> _stepsQuestions = [
-    "Enter Event Name:",
-    "Enter Event Type:",
-    "Enter Faculty Involved:",
-    "Enter Venue:",
-    "Enter Date:",
-    "Enter Timings:",
-    "Upload Documents:"
-  ];
-
-  final Map<String, dynamic> _currentProposal = {
-    "eventName": "",
-    "eventType": "",
-    "faculty": "",
-    "venue": "",
-    "date": "",
-    "timings": "",
-    "document": null // Storing the file object here
-  };
-
-  final TextEditingController _textController = TextEditingController();
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-
-    if (picked != null) {
-      setState(() {
-        _currentProposal['date'] = picked.toIso8601String().split('T')[0];
-      });
-    }
-  }
-
-  Future<void> _pickDocument() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      setState(() {
-        _currentProposal['document'] = result.files.single.path; // Storing path
-      });
-    }
-  }
-
-  Future<void> _submitProposal() async {
-    try {
-      await repository.submitProposal(
-        eventName: _currentProposal['eventName'] ?? "",
-        eventType: _currentProposal['eventType'] ?? "",
-        startDate: _currentProposal['date'] ?? "",
-        endDate: _currentProposal['date'] ?? "",
-        location: _currentProposal['venue'] ?? "",
-        approval: false,
-        documentPath: _currentProposal['document'],
-        faculty: _currentProposal['faculty'],
-        timings: _currentProposal['timings'],
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Proposal submitted successfully!")),
-      );
-
-      setState(() {
-        _currentStep = 0;
-        _currentProposal.clear();
-        _textController.clear();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ProposalStepsWidget(currentStep: _currentStep),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            _stepsQuestions[_currentStep],
-            style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xff2F4F6F)),
-          ),
-        ),
-        if (_currentStep < 4)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: _textController,
-              onChanged: (value) {
-                if (_currentStep == 0) _currentProposal['eventName'] = value;
-                if (_currentStep == 1) _currentProposal['eventType'] = value;
-                if (_currentStep == 2) _currentProposal['faculty'] = value;
-                if (_currentStep == 3) _currentProposal['venue'] = value;
-              },
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                hintText: 'Enter your answer here',
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
-          ),
-        if (_currentStep == 4)
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () => _pickDate(context),
-              child: const Text("Pick Date: "),
-            ),
-          ),
-        if (_currentStep == 5) // Timings step
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: _textController,
-              onChanged: (value) {
-                _currentProposal['timings'] = value;
-              },
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                hintText:
-                    'Enter event timings here (e.g., 10:00 AM - 12:00 PM)',
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
-          ),
-        if (_currentStep == 6)
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: _pickDocument,
-              child: const Text("Upload Document"),
-            ),
-          ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
-            onPressed: () {
-              if (_currentStep < _stepsQuestions.length - 1) {
-                setState(() {
-                  _currentStep++;
-                  _textController.clear();
-                });
-              } else {
-                _submitProposal();
-              }
-            },
-            child: Text(
-                _currentStep == _stepsQuestions.length - 1 ? 'Submit' : 'Next'),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class ProposalStepsWidget extends StatelessWidget {
-  final int currentStep;
-  const ProposalStepsWidget({super.key, required this.currentStep});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        7,
-        (index) => Container(
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color:
-                index <= currentStep ? Colors.green : const Color(0xff2F4F6F),
-            border: Border.all(color: Colors.white, width: 2),
-          ),
-          child: Text(
-            '${index + 1}',
-            style: const TextStyle(color: Colors.white, fontSize: 20),
-            textAlign: TextAlign.center,
-          ),
+        icon: Icon(icon, color: Colors.white),
+        label: Text(
+          label,
+          style: const TextStyle(color: Colors.white, fontSize: 14),
         ),
       ),
     );
@@ -371,7 +308,7 @@ class _ViewSubmissionsPageState extends State<ViewSubmissionsPage> {
   @override
   void initState() {
     super.initState();
-    proposalsFuture = repository.fetchProposals(); // Initial data load
+    proposalsFuture = repository.fetchData(); // Initial data load
   }
 
   Future<void> _viewDocument(String base64PDF, String fileName) async {
@@ -447,29 +384,39 @@ class _ViewSubmissionsPageState extends State<ViewSubmissionsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Event Name: ${proposal['eventTitle'] ?? 'N/A'}",
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                      // Render all fields except eventPDF and document
+                      ...proposal.entries
+                          .where((entry) =>
+                              entry.key != 'eventPDF' &&
+                              entry.key != 'document')
+                          .map((entry) {
+                        final key = entry.key;
+                        final value = entry.value ?? 'N/A';
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text("$key: $value"),
+                        );
+                      }).toList(),
+
                       const SizedBox(height: 8),
-                      Text("Event Type: ${proposal['eventType'] ?? 'N/A'}"),
-                      const SizedBox(height: 8),
-                      Text("Faculty: ${proposal['faculty'] ?? 'N/A'}"),
-                      const SizedBox(height: 8),
-                      Text("Venue: ${proposal['location'] ?? 'N/A'}"),
-                      const SizedBox(height: 8),
-                      Text("Date: ${proposal['startDate'] ?? 'N/A'}"),
-                      const SizedBox(height: 8),
-                      Text("Timings: ${proposal['timings'] ?? 'N/A'}"),
-                      const SizedBox(height: 8),
-                      // Display a button for viewing the document
+
+                      // Render eventPDF or document if available
                       if (proposal['eventPDF'] != null)
                         TextButton(
                           onPressed: () {
                             final base64PDF = proposal['eventPDF'];
                             _viewDocument(base64PDF,
                                 proposal['eventTitle'] ?? 'document');
+                          },
+                          child: const Text('Save Event PDF to Downloads'),
+                        )
+                      else if (proposal['document'] != null)
+                        TextButton(
+                          onPressed: () {
+                            final base64Document = proposal['document'];
+                            _viewDocument(base64Document,
+                                proposal['documentTitle'] ?? 'document');
                           },
                           child: const Text('Save Document to Downloads'),
                         )
@@ -493,14 +440,5 @@ class _ViewSubmissionsPageState extends State<ViewSubmissionsPage> {
       return Directory('${Platform.environment['HOME']}/Downloads');
     }
     return null;
-  }
-}
-
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Settings"));
   }
 }
