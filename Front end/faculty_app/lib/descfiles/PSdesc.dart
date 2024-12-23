@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hod_app/screens/utility.dart';
 
-Utility utility = Utility();
+class PSDesc extends StatelessWidget {
+  final Map<String, String> details;
 
-class BCDesc extends StatelessWidget {
-  final Map<String, dynamic> details;
-
-  const BCDesc({super.key, required this.details});
+  const PSDesc({super.key, required this.details});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Book Chapter Details"),
+        title: const Text("Professional Society Activity Details"),
         backgroundColor: const Color(0xff2F4F6F),
       ),
       body: SingleChildScrollView(
@@ -20,32 +17,30 @@ class BCDesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Authors with Affiliations", details["authors"]!),
-            _buildDetailRow("Paper Title", details["papertitle"]!),
-            _buildDetailRow("Abstract", details["abstract"]!),
-            _buildDetailRow("Journal Name", details["journalname"]!),
-            _buildDetailRow("Publication Level", details["publicationlevel"]!),
-            _buildDetailRow("Publication Date", details["publicationdate"]!),
-            _buildDetailRow("Publisher", details["publisher"]!),
-            _buildDetailRow("DOI", details["doi"]!),
-            _buildDetailRow("Proof Link", details["prooflink"]!),
-            _buildDetailRow(
-                "Scopus ID/WoS ID/ORCID ID", details["identifier"].toString()),
+            _buildDetailRow("Society Name", details["societyName"]!),
+            _buildDetailRow("Mode", details["mode"]!),
+            _buildDetailRow("Activity Type", details["activityType"]!),
+            _buildDetailRow("Date", details["date"]!),
+            _buildDetailRow("Number of Days", details["numberOfDays"]!),
+            _buildDetailRow("GPS Photos/Videos", details["gpsPhotosVideos"]!),
+            _buildDetailRow("Budget Sanctioned", details["budgetSanctioned"]!),
+            _buildDetailRow("Report", details["report"]!),
+            _buildDetailRow("Organizers", details["organizers"]!),
+            _buildDetailRow("Conveners", details["conveners"]!),
+            _buildDetailRow("Feedback", details["feedback"]!),
+            _buildDetailRow("Participants List", details["participantsList"]!),
+            _buildDetailRow("Certificates", details["certificates"]!),
+            _buildDetailRow("Speakers Details", details["speakersDetails"]!),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                utility.viewDocument(
-                  details['document'],
-                  details["papertitle"] ?? 'Document',
-                  context,
-                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text("Document downloaded successfully!"),
+                    content: Text("Attachments downloaded successfully!"),
                   ),
                 );
               },
-              child: const Text("Download Document"),
+              child: const Text("Download Attachments"),
             ),
           ],
         ),

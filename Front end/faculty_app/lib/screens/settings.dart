@@ -93,7 +93,7 @@ class SettingsPage extends StatelessWidget {
           const Align(
             alignment: Alignment.center,
             child: Text(
-              'Created by Bilal, Devesh, Naindeep Singh, Puneeth',
+              'Created by Bilal A, Devesh M, Naindeep S, Punith K',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,

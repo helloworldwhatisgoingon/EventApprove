@@ -1,40 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/repository.dart';
 import '../descfiles/bcdesc.dart';
 
-class BookChapterView extends StatelessWidget {
+Repository repository = Repository();
+
+class BookChapterView extends StatefulWidget {
   const BookChapterView({super.key});
+
+  @override
+  State<BookChapterView> createState() => _BookChapterViewState();
+}
+
+class _BookChapterViewState extends State<BookChapterView> {
+  @override
+  void initState() {
+    super.initState();
+    fetchEvent();
+  }
+
+  List<Map<String, dynamic>> bookChapters = [];
+
+  Future<void> fetchEvent() async {
+    final _conf = await repository.fetchEvents('bookchapter');
+
+    // Filter the conferences where 'approval' is null
+    final filteredBookChapter =
+        _conf.where((bookChapter) => bookChapter['approval'] == null).toList();
+
+    setState(() {
+      bookChapters = filteredBookChapter;
+    });
+  }
+
+  Future<void> updateConference(int conferenceId, bool status) async {
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
+  }
+
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Sample book chapter data
-    final List<Map<String, String>> bookChapters = [
-      {
-        "authors": "Author X, Author Y",
-        "title": "Advances in Machine Learning",
-        "abstract": "This chapter explores advanced ML techniques...",
-        "journalName": "Machine Learning Journal",
-        "publicationLevel": "International",
-        "publicationDate": "October 2023",
-        "publisher": "Springer",
-        "doi": "10.1007/exampledoi",
-        "document": "AdvancesInML.pdf",
-        "proofLink": "https://scopus.com/example-proof",
-        "scopusId": "112233",
-      },
-      {
-        "authors": "Author A, Author B",
-        "title": "Applications of AI in Healthcare",
-        "abstract": "This chapter delves into AI applications in healthcare...",
-        "journalName": "Healthcare AI Journal",
-        "publicationLevel": "National",
-        "publicationDate": "December 2022",
-        "publisher": "IEEE",
-        "doi": "10.5678/anotherdoi",
-        "document": "AIHealthcare.pdf",
-        "proofLink": "https://wos.com/another-proof",
-        "scopusId": "445566",
-      },
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -49,11 +59,41 @@ class BookChapterView extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(
-                chapter["title"]!,
+                chapter["papertitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text("Journal: ${chapter["journalName"]}"),
-              trailing: const Icon(Icons.arrow_forward),
+              subtitle: Text("Journal: ${chapter["journalname"]}"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      // Handle red cross action (e.g., mark as canceled)
+                      updateConference(chapter['master_id'], false);
+
+                      print("Red cross pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.check, color: Colors.green),
+                    onPressed: () {
+                      // Handle green tick action (e.g., mark as accepted)
+                      updateConference(chapter['master_id'], true);
+                      print("Green tick pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // Handle delete action (e.g., remove chapter)
+                      deleteConference(chapter['master_id']);
+                      print("Delete pressed");
+                    },
+                  ),
+                  const Icon(Icons.arrow_forward),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,

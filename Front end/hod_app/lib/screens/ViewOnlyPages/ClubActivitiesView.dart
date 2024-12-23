@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import '../descfiles/cadesc.dart';
+import '../descfiles/cadesc.dart'; // Correct path for cadesc.dart
 
 class ClubActivitiesView extends StatelessWidget {
   const ClubActivitiesView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Sample club activities data
     final List<Map<String, String>> clubActivities = [
       {
         "clubName": "AI Enthusiasts Club",
@@ -24,22 +23,6 @@ class ClubActivitiesView extends StatelessWidget {
         "certificates": "AI_Workshop_Certificates.zip",
         "speakers": "Dr. Alan AI, Dr. Ada Data",
       },
-      {
-        "clubName": "Quiz Masters Club",
-        "activityType": "Quiz",
-        "title": "Tech Trivia 2024",
-        "date": "2024-08-15",
-        "numDays": "1",
-        "gpsPhotos": "Quiz_Photos.zip",
-        "budgetSanctioned": "₹10,000",
-        "report": "Quiz_Report.pdf",
-        "organizers": "Dr. Knowit, Prof. Quizzy",
-        "conveners": "Prof. Question",
-        "feedback": "Quiz_Feedback.pdf",
-        "participantsList": "Quiz_Participants.pdf",
-        "certificates": "Quiz_Certificates.zip",
-        "speakers": "NA",
-      },
     ];
 
     return Scaffold(
@@ -55,11 +38,12 @@ class ClubActivitiesView extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(
-                activity["title"]!,
+                activity["title"] ?? "No Title",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text("Activity Type: ${activity["activityType"]}"),
-              trailing: const Icon(Icons.arrow_forward),
+              subtitle:
+                  Text("Activity Type: ${activity["activityType"] ?? "N/A"}"),
+              trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 Navigator.push(
                   context,

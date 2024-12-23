@@ -9,27 +9,27 @@ class SettingsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+      body: const Padding(
+        padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Settings',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
-            const ListTile(
+            SizedBox(height: 20),
+            ListTile(
               leading: Icon(Icons.account_circle),
               title: Text('Account'),
               subtitle: Text('Manage your account details'),
             ),
-            const ListTile(
+            ListTile(
               leading: Icon(Icons.notifications),
               title: Text('Notifications'),
               subtitle: Text('Manage notification preferences'),
             ),
-            const ListTile(
+            ListTile(
               leading: Icon(Icons.security),
               title: Text('Privacy'),
               subtitle: Text('Adjust privacy settings'),

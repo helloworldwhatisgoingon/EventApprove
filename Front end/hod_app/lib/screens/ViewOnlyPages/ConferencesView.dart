@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hod_app/repository.dart';
+import 'package:hod_app/screens/repository.dart';
 import '../descfiles/confdesc.dart';
 
 Repository repository = Repository();
@@ -17,11 +17,11 @@ class _ConferencesViewState extends State<ConferencesView> {
   @override
   void initState() {
     super.initState();
-    fetchConference();
+    fetchEvent();
   }
 
-  Future<void> fetchConference() async {
-    final _conf = await repository.fetchConference();
+  Future<void> fetchEvent() async {
+    final _conf = await repository.fetchEvents('conference');
 
     // Filter the conferences where 'approval' is null
     final filteredConferences =
@@ -33,13 +33,13 @@ class _ConferencesViewState extends State<ConferencesView> {
   }
 
   Future<void> updateConference(int conferenceId, bool status) async {
-    final _conf = await repository.updateConferenceStatus(conferenceId, status);
-    fetchConference();
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
   }
 
-  Future<void> deleteConference(int conferenceId) async {
-    await repository.deleteConference(conferenceId);
-    fetchConference();
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
   }
 
   @override
@@ -76,7 +76,7 @@ class _ConferencesViewState extends State<ConferencesView> {
                     icon: const Icon(Icons.close, color: Colors.red),
                     onPressed: () {
                       // Handle red cross action (e.g., mark as canceled)
-                      updateConference(conference['conference_id'], false);
+                      updateConference(conference['master_id'], false);
 
                       print("Red cross pressed");
                     },
@@ -85,7 +85,7 @@ class _ConferencesViewState extends State<ConferencesView> {
                     icon: const Icon(Icons.check, color: Colors.green),
                     onPressed: () {
                       // Handle green tick action (e.g., mark as accepted)
-                      updateConference(conference['conference_id'], true);
+                      updateConference(conference['master_id'], true);
                       print("Green tick pressed");
                     },
                   ),
@@ -93,7 +93,7 @@ class _ConferencesViewState extends State<ConferencesView> {
                     icon: const Icon(Icons.delete, color: Colors.black),
                     onPressed: () {
                       // Handle delete action (e.g., remove conference)
-                      deleteConference(conference['conference_id']);
+                      deleteConference(conference['master_id']);
                       print("Delete pressed");
                     },
                   ),

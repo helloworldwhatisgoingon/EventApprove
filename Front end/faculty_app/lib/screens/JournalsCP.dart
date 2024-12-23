@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -74,14 +75,39 @@ class _JournalsCPState extends State<JournalsCP> {
 
     if (picked != null) {
       setState(() {
-        _currentJournalDetails['publicationDate'] =
-            "${picked.month}/${picked.year}";
+        _currentJournalDetails['publicationDate'] = picked;
       });
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitJournalDetails() async {
     try {
+      final journalData = await repository.createJournalData(
+        authors: _currentJournalDetails["authors"],
+        paperTitle: _currentJournalDetails["paperTitle"],
+        abstract: _currentJournalDetails["abstract"],
+        journalName: _currentJournalDetails["journalName"],
+        publicationLevel: _currentJournalDetails["publicationLevel"],
+        publicationDate: _currentJournalDetails["publicationDate"],
+        publisher: _currentJournalDetails["publisher"],
+        doiIsbn: _currentJournalDetails["doiIsbn"],
+        documentPath: _currentJournalDetails["document"],
+        proofLink: _currentJournalDetails["proofLink"],
+        impactFactor: _currentJournalDetails["impactFactor"] != null
+            ? double.parse(_currentJournalDetails["impactFactor"])
+            : null,
+        quartile: _currentJournalDetails["quartile"],
+        identifier: _currentJournalDetails["identifier"] ?? "",
+      );
+
+      await repository.sendEvent(
+        eventType: "journals",
+        eventName: _currentJournalDetails["paperTitle"],
+        additionalData: journalData,
+      );
+
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(

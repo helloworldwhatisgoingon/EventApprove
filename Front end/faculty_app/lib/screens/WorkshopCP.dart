@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -86,8 +87,43 @@ class _WorkshopsCPState extends State<WorkshopsCP> {
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitWorkshopDetails() async {
+    String from = _currentWorkshopDetails["dates.from"];
+    String to = _currentWorkshopDetails["dates.to"];
+    String datesString =
+        from.isEmpty && to.isEmpty ? "No dates available" : "$from - $to";
     try {
+      final workshopData = await repository.createWorkshopData(
+        workshopTitle: _currentWorkshopDetails["workshopTitle"],
+        mode: _currentWorkshopDetails["mode"],
+        dates: datesString,
+        days: _currentWorkshopDetails["days"],
+        organizers: _currentWorkshopDetails["organizers"],
+        conveners: _currentWorkshopDetails["conveners"],
+        speakersDetails: _currentWorkshopDetails["speakersDetails"],
+        sanctionedAmount: _currentWorkshopDetails["sanctionedAmount"],
+        facultyReceivingAmount:
+            _currentWorkshopDetails["facultyReceivingAmount"],
+        identifier: 0, // cardcoded dummy val
+        brochurePath: _currentWorkshopDetails["brochure"], // Optional
+        gpsMediaPath: _currentWorkshopDetails["gpsMedia"], // Optional
+        reportPath: _currentWorkshopDetails["report"], // Optional
+        feedbackPath: _currentWorkshopDetails["feedback"], // Optional
+        participantsListPath:
+            _currentWorkshopDetails["participantsList"], // Optional
+        certificatesPath: _currentWorkshopDetails["certificates"], // Optional
+        expenditureReportPath:
+            _currentWorkshopDetails["expenditureReport"], // Optional
+      );
+
+      await repository.sendEvent(
+        eventType: "workshop",
+        eventName: _currentWorkshopDetails["workshopTitle"],
+        additionalData: workshopData,
+      );
+
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(

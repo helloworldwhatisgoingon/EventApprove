@@ -1,4 +1,4 @@
-import 'package:hod_app/screens/utility.dart';
+import 'package:faculty_app/utility.dart';
 import 'package:flutter/material.dart';
 
 Utility utility = Utility();
@@ -25,7 +25,7 @@ class _EventDescState extends State<EventDesc> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Paper Title", widget.details["papertitle"]!),
+            _buildDetailRow("Paper Title", widget.details["event_name"]!),
             _buildDetailRow("Abstract", widget.details["abstract"]!),
             _buildDetailRow(
                 "Conference Name", widget.details["conferencename"]!),

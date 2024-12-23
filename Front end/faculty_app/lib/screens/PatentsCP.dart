@@ -148,11 +148,11 @@ class _PatentsCPState extends State<PatentsCP> {
       case 3:
         return _buildInputField("inventors", "Enter Inventor(s)");
       case 4:
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
+        return const Padding(
+          padding: EdgeInsets.all(16.0),
           child: Text(
             "Patentee Name: Dayananda Sagar University",
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         );
       case 5:

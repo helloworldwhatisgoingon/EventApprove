@@ -84,17 +84,22 @@ class _ConferencesCPState extends State<ConferencesCP> {
   Future<void> _submitConferenceDetails() async {
     try {
       // Simulate submission
-      await repository.submitConference(
-        paperTitle: _currentConferenceDetails["paperTitle"] ?? "",
-        abstract: _currentConferenceDetails["abstract"] ?? "",
-        conferenceName: _currentConferenceDetails["conferenceName"] ?? "",
-        publicationLevel: _currentConferenceDetails["publicationLevel"] ?? "",
-        publicationDate: _currentConferenceDetails["publicationDate"] ?? "",
-        publisher: _currentConferenceDetails["publisher"] ?? "",
-        doiIsbn: _currentConferenceDetails["doiIsbn"] ?? "",
-        documentPath: _currentConferenceDetails["document"],
-        proofLink: _currentConferenceDetails["proofLink"] ?? "",
-        identifier: _currentConferenceDetails["identifier"] ?? "",
+      final conferenceData = await repository.createConferenceData(
+          paperTitle: _currentConferenceDetails["paperTitle"],
+          abstract: _currentConferenceDetails["abstract"],
+          conferenceName: _currentConferenceDetails["conferenceName"],
+          publicationLevel: _currentConferenceDetails["publicationLevel"],
+          publicationDate: _currentConferenceDetails["publicationDate"],
+          publisher: _currentConferenceDetails["publisher"],
+          doiIsbn: _currentConferenceDetails["doiIsbn"],
+          documentPath: _currentConferenceDetails["document"],
+          identifier: _currentConferenceDetails["identifier"] ?? "",
+          proofLink: _currentConferenceDetails["proofLink"]);
+
+      await repository.sendEvent(
+        eventType: "conference",
+        eventName: _currentConferenceDetails["paperTitle"],
+        additionalData: conferenceData,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,23 +1,15 @@
-import 'package:hod_app/screens/utility.dart';
 import 'package:flutter/material.dart';
 
-Utility utility = Utility();
+class PatentDesc extends StatelessWidget {
+  final Map<String, String> details;
 
-class EventDesc extends StatefulWidget {
-  final Map<String, dynamic> details;
+  const PatentDesc({super.key, required this.details});
 
-  const EventDesc({super.key, required this.details});
-
-  @override
-  State<EventDesc> createState() => _EventDescState();
-}
-
-class _EventDescState extends State<EventDesc> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Conference Details"),
+        title: const Text("Patent Details"),
         backgroundColor: const Color(0xff2F4F6F),
       ),
       body: SingleChildScrollView(
@@ -25,26 +17,28 @@ class _EventDescState extends State<EventDesc> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Paper Title", widget.details["papertitle"]!),
-            _buildDetailRow("Abstract", widget.details["abstract"]!),
             _buildDetailRow(
-                "Conference Name", widget.details["conferencename"]!),
+                "Application Number", details["applicationNumber"]!),
+            _buildDetailRow("Patent Number", details["patentNumber"]!),
+            _buildDetailRow("Title", details["title"]!),
+            _buildDetailRow("Inventor(s)", details["inventors"]!),
+            _buildDetailRow("Patentee Name", details["patenteeName"]!),
+            _buildDetailRow("Filing Date", details["filingDate"]!),
+            _buildDetailRow("Status", details["status"]!),
+            _buildDetailRow("Patent Country", details["patentCountry"]!),
             _buildDetailRow(
-                "Publication Level", widget.details["publicationlevel"]!),
-            _buildDetailRow(
-                "Publication Date", widget.details["publicationdate"]!),
-            _buildDetailRow("Publisher", widget.details["publisher"]!),
-            _buildDetailRow("DOI, ISBN", widget.details["doiisbn"]!),
-            _buildDetailRow("Proof Link", widget.details["prooflink"]!),
+                "Publication/Granted Date", details["publicationDate"]!),
+            _buildDetailRow("Abstract", details["abstract"]!),
+            _buildDetailRow("Patent URL", details["url"]!),
+            _buildDetailRow("Attached Document", details["document"]!),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                final base64Document = widget.details["document"]!;
-                utility.viewDocument(
-                  base64Document,
-                  widget.details["papertitle"] ?? 'Document',
-                  context,
-                ); // Handle document viewing or downloading
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Document downloaded successfully!"),
+                  ),
+                );
               },
               child: const Text("Download Document"),
             ),

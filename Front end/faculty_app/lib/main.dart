@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:faculty_app/accepted_or_rejected.dart';
 import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'screens/IAmarksCP.dart';
@@ -66,12 +67,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: AnimatedOpacity(
           opacity: 1.0,
-          duration: const Duration(seconds: 2),
-          child: const Text(
+          duration: Duration(seconds: 2),
+          child: Text(
             'Welcome to DSU-EventApprove!',
             style: TextStyle(
               fontSize: 24,
@@ -98,7 +99,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Row(
         children: [
-          Sidebar(),
+          const Sidebar(),
           Expanded(
             child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -193,7 +194,7 @@ class _HomePageState extends State<HomePage> {
       case "Faculty Major Achievements":
         return const FacultyAchievementsCP();
       case "Student Major Achievements":
-        return const StudentAchievementsCP();
+        return const StudentsAchievementsCP();
       case "Professional Societies activities":
         return const ProfessionalSocietiesCP();
       default:
@@ -203,6 +204,8 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Sidebar extends StatelessWidget {
+  const Sidebar({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -240,7 +243,8 @@ class Sidebar extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const ViewSubmissionsPage()),
+                  builder: (context) => const AcceptedAndRejectedView(),
+                ),
               );
             },
           ),
@@ -397,7 +401,7 @@ class _ViewSubmissionsPageState extends State<ViewSubmissionsPage> {
                           padding: const EdgeInsets.only(bottom: 8.0),
                           child: Text("$key: $value"),
                         );
-                      }).toList(),
+                      }),
 
                       const SizedBox(height: 8),
 

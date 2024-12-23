@@ -1,50 +1,50 @@
 import 'package:flutter/material.dart';
 import '../descfiles/wsdesc.dart';
+import 'package:hod_app/screens/repository.dart';
 
-class WorkshopsView extends StatelessWidget {
+Repository repository = Repository();
+
+class WorkshopsView extends StatefulWidget {
   const WorkshopsView({super.key});
+
+  @override
+  State<WorkshopsView> createState() => _WorkshopsViewState();
+}
+
+class _WorkshopsViewState extends State<WorkshopsView> {
+  @override
+  void initState() {
+    super.initState();
+    fetchEvent();
+  }
+
+  List<Map<String, dynamic>> workshops = [];
+
+  Future<void> fetchEvent() async {
+    final _conf = await repository.fetchEvents('workshop');
+
+    // Filter the conferences where 'approval' is null
+    final filteredWorkshop =
+        _conf.where((workshop) => workshop['approval'] == null).toList();
+
+    setState(() {
+      workshops = filteredWorkshop;
+    });
+  }
+
+  Future<void> updateConference(int conferenceId, bool status) async {
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
+  }
+
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Sample workshop data
-    final List<Map<String, String>> workshops = [
-      {
-        "workshopTitle": "AI and Machine Learning Workshop",
-        "mode": "Offline",
-        "brochure": "AI_ML_Workshop_Brochure.pdf",
-        "date": "2024-01-15 to 2024-01-17",
-        "numDays": "3",
-        "gpsPhotos": "AI_ML_Workshop_Photos.zip",
-        "report": "AI_ML_Workshop_Report.pdf",
-        "organizers": "Dr. A, Dr. B",
-        "conveners": "Prof. X, Prof. Y",
-        "feedback": "AI_ML_Workshop_Feedback.pdf",
-        "participantsList": "AI_ML_Workshop_Participants.pdf",
-        "certificates": "AI_ML_Workshop_Certificates.zip",
-        "amountSanctioned": "₹1,50,000",
-        "facultyReceivingAmount": "Prof. X",
-        "expenditureReport": "AI_ML_Workshop_Expenditure.pdf",
-        "speakers": "Dr. John Doe, Dr. Jane Smith",
-      },
-      {
-        "workshopTitle": "Cybersecurity Essentials",
-        "mode": "Online",
-        "brochure": "Cybersecurity_Workshop_Brochure.pdf",
-        "date": "2024-02-10",
-        "numDays": "1",
-        "gpsPhotos": "Cybersecurity_Workshop_Photos.zip",
-        "report": "Cybersecurity_Workshop_Report.pdf",
-        "organizers": "Dr. C, Dr. D",
-        "conveners": "Prof. Z",
-        "feedback": "Cybersecurity_Workshop_Feedback.pdf",
-        "participantsList": "Cybersecurity_Workshop_Participants.pdf",
-        "certificates": "Cybersecurity_Workshop_Certificates.zip",
-        "amountSanctioned": "₹50,000",
-        "facultyReceivingAmount": "Prof. Z",
-        "expenditureReport": "Cybersecurity_Workshop_Expenditure.pdf",
-        "speakers": "Dr. Alice, Dr. Bob",
-      },
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -59,11 +59,41 @@ class WorkshopsView extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(
-                workshop["workshopTitle"]!,
+                workshop["workshoptitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text("Mode: ${workshop["mode"]}"),
-              trailing: const Icon(Icons.arrow_forward),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      // Handle red cross action (e.g., mark as canceled)
+                      updateConference(workshop['master_id'], false);
+
+                      print("Red cross pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.check, color: Colors.green),
+                    onPressed: () {
+                      // Handle green tick action (e.g., mark as accepted)
+                      updateConference(workshop['master_id'], true);
+                      print("Green tick pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // Handle delete action (e.g., remove workshop)
+                      deleteConference(workshop['master_id']);
+                      print("Delete pressed");
+                    },
+                  ),
+                  const Icon(Icons.arrow_forward),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,

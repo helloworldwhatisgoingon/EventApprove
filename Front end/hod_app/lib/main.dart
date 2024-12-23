@@ -1,7 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-import 'package:hod_app/accepted_or_rejected.dart';
+import 'package:hod_app/screens/accepted_or_rejected.dart';
+
+// Import all the necessary pages
 import 'screens/ViewOnlyPages/IAmarksView.dart';
 import 'screens/ViewOnlyPages/ConferencesView.dart';
 import 'screens/ViewOnlyPages/JournalsView.dart';
@@ -11,7 +11,7 @@ import 'screens/ViewOnlyPages/EventsView.dart';
 import 'screens/ViewOnlyPages/WorkshopsView.dart';
 import 'screens/ViewOnlyPages/FDView.dart';
 import 'screens/ViewOnlyPages/SeminarsView.dart';
-import 'screens/ViewOnlyPages/ClubActivitiesView.dart';
+import 'screens/ViewOnlyPages/ClubActivitiesView.dart'; // Import the ClubActivitiesView
 import 'screens/ViewOnlyPages/IndustrialVisitsView.dart';
 import 'screens/ViewOnlyPages/FacultyAchievementsView.dart';
 import 'screens/ViewOnlyPages/StudentAchievementsView.dart';
@@ -40,7 +40,7 @@ class HODDashboardApp extends StatelessWidget {
   }
 }
 
-// Splash Screen remains the same as in the professor's dashboard
+// Splash Screen
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -52,7 +52,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Adding a delay before navigating to the HomePage
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
@@ -63,13 +62,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xff2F4F6F),
+    return Scaffold(
+      backgroundColor: const Color(0xff2F4F6F),
       body: Center(
         child: AnimatedOpacity(
           opacity: 1.0,
-          duration: Duration(seconds: 2),
-          child: Text(
+          duration: const Duration(seconds: 2),
+          child: const Text(
             'Welcome to DSU-HOD Dashboard!',
             style: TextStyle(
               fontSize: 24,
@@ -83,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// HomePage for HOD with view-only functionality
+// HomePage for HOD
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -97,40 +96,41 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Row(
         children: [
-          Sidebar(),
+          Sidebar(), // Sidebar
           Expanded(
             child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GridView.count(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 15,
-                  crossAxisSpacing: 15,
-                  children: [
-                    buildCategoryCard("IA Marks", Icons.school),
-                    buildCategoryCard("Conferences", Icons.business),
-                    buildCategoryCard("Journals", Icons.book),
-                    buildCategoryCard(
-                        "Book- chapter/Published", Icons.menu_book),
-                    buildCategoryCard("Patents", Icons.lightbulb),
-                    buildCategoryCard("Events", Icons.event),
-                    buildCategoryCard("Workshops", Icons.work),
-                    buildCategoryCard("FDP", Icons.people),
-                    buildCategoryCard("Seminars/Webinars", Icons.web),
-                    buildCategoryCard("Club Activities", Icons.group),
-                    buildCategoryCard("Industrial Visits", Icons.factory),
-                    buildCategoryCard("Faculty Major Achievements", Icons.star),
-                    buildCategoryCard(
-                        "Student Major Achievements", Icons.emoji_events),
-                    buildCategoryCard("Professional Societies activities",
-                        Icons.account_balance),
-                  ],
-                )),
+              padding: const EdgeInsets.all(20.0),
+              child: GridView.count(
+                crossAxisCount: 3,
+                mainAxisSpacing: 15,
+                crossAxisSpacing: 15,
+                children: [
+                  buildCategoryCard("IA Marks", Icons.school),
+                  buildCategoryCard("Conferences", Icons.business),
+                  buildCategoryCard("Journals", Icons.book),
+                  buildCategoryCard("Book- chapter/Published", Icons.menu_book),
+                  buildCategoryCard("Patents", Icons.lightbulb),
+                  buildCategoryCard("Events", Icons.event),
+                  buildCategoryCard("Workshops", Icons.work),
+                  buildCategoryCard("FDP", Icons.people),
+                  buildCategoryCard("Seminars/Webinars", Icons.web),
+                  buildCategoryCard("Club Activities", Icons.group),
+                  buildCategoryCard("Industrial Visits", Icons.factory),
+                  buildCategoryCard("Faculty Major Achievements", Icons.star),
+                  buildCategoryCard(
+                      "Student Major Achievements", Icons.emoji_events),
+                  buildCategoryCard("Professional Societies activities",
+                      Icons.account_balance),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
+  // Category card builder
   Widget buildCategoryCard(String label, IconData icon) {
     return Card(
       elevation: 4,
@@ -165,6 +165,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Function to get the page based on the event type
   Widget getPageForEvent(String eventType) {
     switch (eventType) {
       case "IA Marks":
@@ -186,7 +187,7 @@ class _HomePageState extends State<HomePage> {
       case "Seminars/Webinars":
         return const SeminarsView();
       case "Club Activities":
-        return const ClubActivitiesView();
+        return const ClubActivitiesView(); // Added Club Activities Page
       case "Industrial Visits":
         return const IndustrialVisitsView();
       case "Faculty Major Achievements":
@@ -201,7 +202,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Sidebar remains the same but with "HOD-specific" options if needed
+// Sidebar with buttons for Accepted and Rejected
 class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -233,16 +234,6 @@ class Sidebar extends StatelessWidget {
             onTap: () {},
           ),
           SidebarButton(
-            icon: Icons.settings,
-            label: "Settings",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          ),
-          SidebarButton(
             icon: Icons.check_circle,
             label: "Accepted", // "Accepted" button
             onTap: () {
@@ -270,12 +261,23 @@ class Sidebar extends StatelessWidget {
               );
             },
           ),
+          SidebarButton(
+            icon: Icons.settings,
+            label: "Settings",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
         ],
       ),
     );
   }
 }
 
+// Sidebar button widget
 class SidebarButton extends StatelessWidget {
   final IconData icon;
   final String label;

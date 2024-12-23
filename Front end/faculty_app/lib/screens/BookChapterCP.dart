@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -70,15 +71,37 @@ class _BookChapterCPState extends State<BookChapterCP> {
 
     if (picked != null) {
       setState(() {
-        _currentBookChapterDetails['publicationDate'] =
-            "${picked.month}/${picked.year}";
+        _currentBookChapterDetails['publicationDate'] = picked;
       });
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitBookChapterDetails() async {
     try {
       // Simulate submission
+      final bookChapterData = await repository.createBookChapterData(
+        authors: _currentBookChapterDetails["authors"],
+        paperTitle: _currentBookChapterDetails["paperTitle"],
+        abstract: _currentBookChapterDetails["abstract"],
+        journalName: _currentBookChapterDetails["journalName"],
+        publicationLevel: _currentBookChapterDetails["publicationLevel"],
+        publicationDate: _currentBookChapterDetails["publicationDate"],
+        publisher: _currentBookChapterDetails["publisher"],
+        doi: _currentBookChapterDetails["doi"],
+        documentPath:
+            _currentBookChapterDetails["document"], // Optional, can be null
+        proofLink: _currentBookChapterDetails["proofLink"],
+        identifier: _currentBookChapterDetails["identifier"] ?? "",
+      );
+
+      await repository.sendEvent(
+        eventType: "bookchapter",
+        eventName: _currentBookChapterDetails["paperTitle"],
+        additionalData: bookChapterData,
+      );
+
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
