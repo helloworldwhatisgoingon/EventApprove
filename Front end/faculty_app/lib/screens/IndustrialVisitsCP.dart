@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -67,8 +68,7 @@ class _IndustrialVisitsCPState extends State<IndustrialVisitsCP> {
 
     if (picked != null) {
       setState(() {
-        _currentVisitDetails[key] =
-            "${picked.day}/${picked.month}/${picked.year}";
+        _currentVisitDetails[key] = picked;
       });
     }
   }
@@ -82,9 +82,35 @@ class _IndustrialVisitsCPState extends State<IndustrialVisitsCP> {
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitVisitDetails() async {
     try {
       // Simulate submission
+      final industrialVisitData = await repository.createIndustrialVisitData(
+        companyName: _currentVisitDetails["companyName"],
+        industryType: _currentVisitDetails["industryType"],
+        visitTitle: _currentVisitDetails["visitTitle"],
+        visitDate: _currentVisitDetails["visitDate"],
+        numDays: _currentVisitDetails["numDays"],
+        gpsMediaPath: _currentVisitDetails["gpsMedia"],
+        budget: _currentVisitDetails["budget"] ?? 0.0,
+        reportPath: _currentVisitDetails["report"],
+        organizers: _currentVisitDetails["organizers"],
+        conveners: _currentVisitDetails["conveners"],
+        feedback: _currentVisitDetails["feedback"],
+        participantsListPath: _currentVisitDetails["participantsList"],
+        certificatesPath: _currentVisitDetails["certificates"],
+        speakersDetails: _currentVisitDetails["speakersDetails"],
+        identifier: 0,
+      );
+
+      await repository.sendEvent(
+        eventType: "industrial_visit",
+        eventName: _currentVisitDetails["visitTitle"],
+        additionalData: industrialVisitData,
+      );
+
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -152,7 +178,8 @@ class _IndustrialVisitsCPState extends State<IndustrialVisitsCP> {
       case 0:
         return _buildInputField("companyName", "Enter Company Name");
       case 1:
-        return _buildDropdownField("industryType", ['Manufacturing', 'IT', 'Automotive', 'Construction', 'Retail']);
+        return _buildDropdownField("industryType",
+            ['Manufacturing', 'IT', 'Automotive', 'Construction', 'Retail']);
       case 2:
         return _buildInputField("visitTitle", "Enter Visit Title");
       case 3:
@@ -212,7 +239,8 @@ class _IndustrialVisitsCPState extends State<IndustrialVisitsCP> {
           ),
         );
       case 13:
-        return _buildInputField("speakersDetails", "Enter Speakers/Guide Details");
+        return _buildInputField(
+            "speakersDetails", "Enter Speakers/Guide Details");
       default:
         return const SizedBox.shrink();
     }

@@ -1,10 +1,18 @@
-import 'package:faculty_app/descfiles/bcdesc.dart';
-import 'package:faculty_app/descfiles/confdesc.dart';
-import 'package:faculty_app/descfiles/journaldesc.dart';
-import 'package:faculty_app/descfiles/wsdesc.dart';
 import 'package:faculty_app/repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:faculty_app/descfiles/PSdesc.dart';
+import 'package:faculty_app/descfiles/bcdesc.dart';
+import 'package:faculty_app/descfiles/cadesc.dart';
+import 'package:faculty_app/descfiles/confdesc.dart';
+import 'package:faculty_app/descfiles/fadesc.dart';
+import 'package:faculty_app/descfiles/fddesc.dart';
+import 'package:faculty_app/descfiles/ivdesc.dart';
+import 'package:faculty_app/descfiles/journaldesc.dart';
+import 'package:faculty_app/descfiles/patentdesc.dart';
+import 'package:faculty_app/descfiles/sadesc.dart';
+import 'package:faculty_app/descfiles/seminardesc.dart';
+import 'package:faculty_app/descfiles/wsdesc.dart';
 
 Repository repository = Repository();
 
@@ -45,6 +53,15 @@ class _AcceptedAndRejectedView extends State<AcceptedAndRejectedView> {
         _futureData = Future.error("Failed to load data");
       });
     }
+  }
+
+  String getStatus(value) {
+    if (value == false) {
+      return 'Rejected';
+    } else if (value == true) {
+      return 'Approved';
+    }
+    return 'Pending';
   }
 
   // Function to generate cards based on submission type
@@ -148,6 +165,110 @@ class _AcceptedAndRejectedView extends State<AcceptedAndRejectedView> {
             (details) => BCDesc(details: details),
           ),
         );
+      case 'patents':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => PatentDesc(details: details),
+          ),
+        );
+      case 'fdp':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => FDDesc(details: details),
+          ),
+        );
+      case 'seminar':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => SeminarDesc(details: details),
+          ),
+        );
+      case 'clubactivity':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => CADesc(details: details),
+          ),
+        );
+      case 'industrial_visit':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => IVDesc(details: details),
+          ),
+        );
+      case 'faculty_achievements':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => FADesc(details: details),
+          ),
+        );
+      case 'student_achievements':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => SADesc(details: details),
+          ),
+        );
+      case 'professional_societies':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => PSDesc(details: details),
+          ),
+        );
       default:
         return const SizedBox
             .shrink(); // If no valid submission type, return an empty widget.
@@ -156,7 +277,7 @@ class _AcceptedAndRejectedView extends State<AcceptedAndRejectedView> {
 
   @override
   Widget build(BuildContext context) {
-    String title = "Submissions";
+    String title = 'Submissions';
 
     return Scaffold(
       appBar: AppBar(
@@ -193,14 +314,5 @@ class _AcceptedAndRejectedView extends State<AcceptedAndRejectedView> {
         },
       ),
     );
-  }
-
-  String getStatus(value) {
-    if (value == false) {
-      return 'Rejected';
-    } else if (value == true) {
-      return 'Approved';
-    }
-    return 'Pending';
   }
 }

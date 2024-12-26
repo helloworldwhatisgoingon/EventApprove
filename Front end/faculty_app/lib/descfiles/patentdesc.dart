@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:faculty_app/utility.dart';
+
+
+Utility utility = Utility();
 
 class PatentDesc extends StatelessWidget {
-  final Map<String, String> details;
+  final Map<String, dynamic> details;
 
   const PatentDesc({super.key, required this.details});
 
@@ -17,61 +21,29 @@ class PatentDesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow(
-                "Application Number", details["applicationNumber"]!),
-            _buildDetailRow("Patent Number", details["patentNumber"]!),
-            _buildDetailRow("Title", details["title"]!),
-            _buildDetailRow("Inventor(s)", details["inventors"]!),
-            _buildDetailRow("Patentee Name", details["patenteeName"]!),
-            _buildDetailRow("Filing Date", details["filingDate"]!),
-            _buildDetailRow("Status", details["status"]!),
-            _buildDetailRow("Patent Country", details["patentCountry"]!),
-            _buildDetailRow(
-                "Publication/Granted Date", details["publicationDate"]!),
-            _buildDetailRow("Abstract", details["abstract"]!),
-            _buildDetailRow("Patent URL", details["url"]!),
-            _buildDetailRow("Attached Document", details["document"]!),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Document downloaded successfully!"),
-                  ),
-                );
-              },
-              child: const Text("Download Document"),
-            ),
+            utility.buildDetailRow(
+                "Application Number", details["applicationnumber"]!, context),
+            utility.buildDetailRow(
+                "Patent Number", details["patentnumber"]!, context),
+            utility.buildDetailRow("Title", details["title"]!, context),
+            utility.buildDetailRow(
+                "Inventor(s)", details["inventors"]!, context),
+            utility.buildDetailRow(
+                "Patentee Name", details["patenteename"]!, context),
+            utility.buildDetailRow(
+                "Filing Date", details["filingdate"]!, context),
+            utility.buildDetailRow("Status", details["status"]!, context),
+            utility.buildDetailRow(
+                "Patent Country", details["patentcountry"]!, context),
+            utility.buildDetailRow("Publication/Granted Date",
+                details["publicationdate"]!, context),
+            utility.buildDetailRow("Abstract", details["abstract"]!, context),
+            utility.buildDetailRow("Patent URL", details["url"]!, context),
+            utility.buildDetailRow(
+                "Attached Document", details["document"]!, context,
+                isDocumentType: true),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

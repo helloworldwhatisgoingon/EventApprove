@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:faculty_app/utility.dart';
+
+
+Utility utility = Utility();
 
 class FDDesc extends StatelessWidget {
-  final Map<String, String> details;
+  final Map<String, dynamic> details;
 
   const FDDesc({super.key, required this.details});
 
@@ -17,67 +21,40 @@ class FDDesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("FDP Title", details["fdpTitle"]!),
-            _buildDetailRow("Mode", details["mode"]!),
-            _buildDetailRow("Brochure", details["brochure"]!),
-            _buildDetailRow("Date", details["date"]!),
-            _buildDetailRow("Number of Days", details["numDays"]!),
-            _buildDetailRow("GPS Photos", details["gpsPhotos"]!),
-            _buildDetailRow("Report", details["report"]!),
-            _buildDetailRow("Organizers", details["organizers"]!),
-            _buildDetailRow("Conveners", details["conveners"]!),
-            _buildDetailRow("Feedback", details["feedback"]!),
-            _buildDetailRow("Participants List", details["participantsList"]!),
-            _buildDetailRow("Certificates", details["certificates"]!),
-            _buildDetailRow("Amount Sanctioned", details["amountSanctioned"]!),
-            _buildDetailRow("Faculty Receiving Sanctioned Amount",
-                details["facultyReceivingAmount"]!),
-            _buildDetailRow("Expenditure Report with Receipts",
-                details["expenditureReport"]!),
-            _buildDetailRow(
-                "Details of Speakers/Resource Persons", details["speakers"]!),
-            _buildDetailRow("Sponsorship", details["sponsorship"]!),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Document downloaded successfully!"),
-                  ),
-                );
-              },
-              child: const Text("Download Attachments"),
-            ),
+            utility.buildDetailRow("FDP Title", details["fdptitle"]!, context),
+            utility.buildDetailRow("Mode", details["mode"]!, context),
+            utility.buildDetailRow("Brochure", details["brochure"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Date", details["dates"]!, context),
+            utility.buildDetailRow("Number of Days", details["days"]!, context),
+            utility.buildDetailRow("GPS Photos", details["gpsmedia"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Report", details["report"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Organizers", details["organizers"]!, context),
+            utility.buildDetailRow("Conveners", details["conveners"]!, context),
+            utility.buildDetailRow("Feedback", details["feedback"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Participants List", details["participantslist"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Certificates", details["certificates"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Amount Sanctioned",
+                details["sanctionedamount"].toString(), context),
+            utility.buildDetailRow("Faculty Receiving Sanctioned Amount",
+                details["facultyreceivingamount"].toString(), context),
+            utility.buildDetailRow("Expenditure Report with Receipts",
+                details["expenditurereport"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Details of Speakers/Resource Persons",
+                details["speakersdetails"]!, context),
+            utility.buildDetailRow(
+                "Sponsorship", details["sponsorship"]!, context),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

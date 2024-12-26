@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -5,7 +6,8 @@ class ProfessionalSocietiesCP extends StatefulWidget {
   const ProfessionalSocietiesCP({super.key});
 
   @override
-  _ProfessionalSocietiesCPState createState() => _ProfessionalSocietiesCPState();
+  _ProfessionalSocietiesCPState createState() =>
+      _ProfessionalSocietiesCPState();
 }
 
 class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
@@ -67,8 +69,7 @@ class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
 
     if (picked != null) {
       setState(() {
-        _currentSocietyDetails[key] =
-            "${picked.day}/${picked.month}/${picked.year}";
+        _currentSocietyDetails[key] = picked;
       });
     }
   }
@@ -82,12 +83,40 @@ class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitSocietyDetails() async {
     try {
+      final professionalSocietyData =
+          await repository.createProfessionalSocietyData(
+        societyName: _currentSocietyDetails["societyName"],
+        eventType: _currentSocietyDetails["eventType"],
+        activityType: _currentSocietyDetails["activityType"],
+        activityDate: _currentSocietyDetails["activityDate"],
+        numberOfDays: _currentSocietyDetails["numberOfDays"],
+        gpsPhotosVideosPath: _currentSocietyDetails["gpsPhotosVideos"],
+        budgetSanctioned: _currentSocietyDetails["budgetSanctioned"],
+        eventReportPath: _currentSocietyDetails["eventReport"],
+        organizers: _currentSocietyDetails["organizers"],
+        conveners: _currentSocietyDetails["conveners"],
+        feedback: _currentSocietyDetails["feedback"],
+        participantsListPath: _currentSocietyDetails["participantsList"],
+        certificatesPath: _currentSocietyDetails["certificates"],
+        speakerDetails: _currentSocietyDetails["speakerDetails"],
+        identifier: 0,
+      );
+
+      await repository.sendEvent(
+        eventType: "professional_societies",
+        eventName: _currentSocietyDetails["societyName"],
+        additionalData: professionalSocietyData,
+      );
+
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Society activity details submitted successfully!")),
+        const SnackBar(
+            content: Text("Society activity details submitted successfully!")),
       );
 
       setState(() {
@@ -149,11 +178,13 @@ class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
 
     switch (_currentStep) {
       case 0:
-        return _buildInputField("societyName", "Enter Professional Society Name (ACM/CSI/IEEE CS)");
+        return _buildInputField(
+            "societyName", "Enter Professional Society Name (ACM/CSI/IEEE CS)");
       case 1:
         return _buildDropdownField("eventType", ['Offline', 'Online']);
       case 2:
-        return _buildDropdownField("activityType", ['Workshop', 'Boot Camp', 'Seminar', 'Quiz', 'Hackathon']);
+        return _buildDropdownField("activityType",
+            ['Workshop', 'Boot Camp', 'Seminar', 'Quiz', 'Hackathon']);
       case 3:
         return Padding(
           padding: const EdgeInsets.all(16.0),

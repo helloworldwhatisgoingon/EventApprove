@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:faculty_app/utility.dart';
+
+
+Utility utility = Utility();
 
 class IVDesc extends StatelessWidget {
-  final Map<String, String> details;
+  final Map<String, dynamic> details;
 
   const IVDesc({super.key, required this.details});
 
@@ -17,58 +21,39 @@ class IVDesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Date of Visit", details["dateOfVisit"]!),
-            _buildDetailRow("Location", details["location"]!),
-            _buildDetailRow("Organizer", details["organizer"]!),
-            _buildDetailRow("Participants List", details["participantsList"]!),
-            _buildDetailRow("Purpose of Visit", details["purpose"]!),
-            _buildDetailRow("Outcomes", details["outcomes"]!),
-            _buildDetailRow("Photos/Videos", details["photosVideos"]!),
-            _buildDetailRow("Report", details["report"]!),
-            _buildDetailRow("Feedback from Participants", details["feedback"]!),
-            _buildDetailRow("Reflection Notes", details["reflectionNotes"]!),
-            _buildDetailRow("Key Topics Covered", details["keyTopicsCovered"]!),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Attachments downloaded successfully!"),
-                  ),
-                );
-              },
-              child: const Text("Download Attachments"),
-            ),
+            utility.buildDetailRow(
+                "Visit Title", details["visittitle"]!, context),
+            utility.buildDetailRow(
+                "Date of Visit", details["visitdate"]!, context),
+            utility.buildDetailRow(
+                "Name of the company", details["companyname"]!, context),
+            utility.buildDetailRow(
+                "Total Days", details["numdays"].toString(), context),
+            utility.buildDetailRow(
+                "Organizers", details["organizers"]!, context),
+            utility.buildDetailRow(
+                "Participants List", details["participantslist"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Industry Type", details["industrytype"]!, context),
+            utility.buildDetailRow("Conveners", details["conveners"]!, context),
+            utility.buildDetailRow(
+                "GPS Photos/Videos", details["gpsmedia"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Budget", details["budget"].toString(), context),
+            utility.buildDetailRow("Report", details["report"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Feedback from Participants", details["feedback"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Certificates", details["certificates"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Speakers", details["speakersdetails"]!, context),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

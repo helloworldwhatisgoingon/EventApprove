@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -63,8 +64,7 @@ class _PatentsCPState extends State<PatentsCP> {
 
     if (picked != null) {
       setState(() {
-        _currentPatentDetails[key] =
-            "${picked.day}/${picked.month}/${picked.year}";
+        _currentPatentDetails[key] = picked;
       });
     }
   }
@@ -78,8 +78,33 @@ class _PatentsCPState extends State<PatentsCP> {
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitPatentDetails() async {
     try {
+      final patentData = await repository.createPatentData(
+        applicationNumber: _currentPatentDetails["applicationNumber"],
+        patentNumber: _currentPatentDetails["patentNumber"],
+        title: _currentPatentDetails["title"],
+        inventors: _currentPatentDetails["inventors"],
+        patenteeName: _currentPatentDetails["patenteeName"],
+        filingDate: _currentPatentDetails["filingDate"],
+        status: _currentPatentDetails["status"],
+        patentCountry: _currentPatentDetails["patentCountry"],
+        publicationDate: _currentPatentDetails["publicationDate"],
+        abstract: _currentPatentDetails["abstract"],
+        url: _currentPatentDetails["url"],
+        documentPath:
+            _currentPatentDetails["document"], // Optional, can be null
+        identifier: 0,
+      );
+
+      await repository.sendEvent( 
+        eventType: "patents",
+        eventName: _currentPatentDetails["title"],
+        additionalData: patentData,
+      );
+
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(

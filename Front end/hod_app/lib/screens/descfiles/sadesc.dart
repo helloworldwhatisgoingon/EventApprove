@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/descfiles/wsdesc.dart';
 
-class SADesc extends StatelessWidget {
-  final Map<String, String> details;
+class SADesc extends StatefulWidget {
+  final Map<String, dynamic> details;
 
   const SADesc({super.key, required this.details});
 
+  @override
+  State<SADesc> createState() => _SADescState();
+}
+
+class _SADescState extends State<SADesc> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,60 +23,31 @@ class SADesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Names of Students", details["studentNames"]!),
-            _buildDetailRow("USNs", details["usns"]!),
-            _buildDetailRow("Year of Study", details["yearOfStudy"]!),
-            _buildDetailRow("Event Type", details["eventType"]!),
-            _buildDetailRow("Event Title", details["eventTitle"]!),
-            _buildDetailRow(
-                "Date of Achievement", details["dateOfAchievement"]!),
-            _buildDetailRow(
-                "Company/Organization", details["companyOrganization"]!),
-            _buildDetailRow("Recognition", details["recognition"]!),
-            _buildDetailRow("Certificate Proof", details["certificateProof"]!),
-            _buildDetailRow("GPS Photo", details["gpsPhoto"]!),
-            _buildDetailRow("Report", details["report"]!),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Attachments downloaded successfully!"),
-                  ),
-                );
-              },
-              child: const Text("Download Attachments"),
-            ),
+            utility.buildDetailRow(
+                "Names of Students", widget.details["studentnames"]!, context),
+            utility.buildDetailRow("USNs", widget.details["usns"]!, context),
+            utility.buildDetailRow(
+                "Year of Study", widget.details["yearofstudy"]!, context),
+            utility.buildDetailRow(
+                "Event Type", widget.details["eventtype"]!, context),
+            utility.buildDetailRow(
+                "Event Title", widget.details["eventtitle"]!, context),
+            utility.buildDetailRow("Date of Achievement",
+                widget.details["achievementdate"]!, context),
+            utility.buildDetailRow("Company/Organization",
+                widget.details["companyorganization"]!, context),
+            utility.buildDetailRow(
+                "Recognition", widget.details["recognition"]!, context),
+            utility.buildDetailRow("Certificate Proof",
+                widget.details["certificateproof"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "GPS Photo", widget.details["gpsphoto"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Report", widget.details["report"]!, context,
+                isDocumentType: true),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

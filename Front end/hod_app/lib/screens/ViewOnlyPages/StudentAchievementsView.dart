@@ -1,41 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/repository.dart';
 import '../descfiles/sadesc.dart';
 
-class StudentAchievementsView extends StatelessWidget {
+class StudentAchievementsView extends StatefulWidget {
   const StudentAchievementsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Sample student achievements data
-    final List<Map<String, String>> studentAchievements = [
-      {
-        "studentNames": "Alice Johnson, Bob Smith",
-        "usns": "1RV21CS001, 1RV21CS002",
-        "yearOfStudy": "Third Year",
-        "eventType": "Hackathon",
-        "eventTitle": "AI Innovation Challenge",
-        "dateOfAchievement": "2024-04-12",
-        "companyOrganization": "Google",
-        "recognition": "First Place",
-        "certificateProof": "AIChallenge_Certificate.pdf",
-        "gpsPhoto": "AIChallenge_GPSPhoto.jpg",
-        "report": "AIChallenge_Report.pdf",
-      },
-      {
-        "studentNames": "Emily Davis",
-        "usns": "1RV21CS010",
-        "yearOfStudy": "Final Year",
-        "eventType": "Project Expo",
-        "eventTitle": "Tech Vision 2024",
-        "dateOfAchievement": "2024-06-05",
-        "companyOrganization": "Microsoft",
-        "recognition": "Second Place",
-        "certificateProof": "TechVision_Certificate.pdf",
-        "gpsPhoto": "TechVision_GPSPhoto.jpg",
-        "report": "TechVision_Report.pdf",
-      },
-    ];
+  State<StudentAchievementsView> createState() =>
+      _StudentAchievementsViewState();
+}
 
+class _StudentAchievementsViewState extends State<StudentAchievementsView> {
+  Repository repository = Repository();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvent();
+  }
+
+  List<Map<String, dynamic>> studentAchievements = [];
+
+  Future<void> fetchEvent() async {
+    final conf = await repository.fetchEvents('student_achievements');
+
+    // Filter the conferences where 'approval' is null
+    final filteredEvent =
+        conf.where((event) => event['approval'] == null).toList();
+
+    setState(() {
+      studentAchievements = filteredEvent;
+    });
+  }
+
+  Future<void> updateConference(int conferenceId, bool status) async {
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
+  }
+
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Student Achievements"),
@@ -49,12 +58,42 @@ class StudentAchievementsView extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(
-                achievement["eventTitle"]!,
+                achievement["eventtitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                  "${achievement["eventType"]} (${achievement["dateOfAchievement"]})"),
-              trailing: const Icon(Icons.arrow_forward),
+                  "${achievement["eventtype"]} (${achievement["achievementdate"]})"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      // Handle red cross action (e.g., mark as canceled)
+                      updateConference(achievement['master_id'], false);
+
+                      print("Red cross pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.check, color: Colors.green),
+                    onPressed: () {
+                      // Handle green tick action (e.g., mark as accepted)
+                      updateConference(achievement['master_id'], true);
+                      print("Green tick pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // Handle delete action (e.g., remove achievement)
+                      deleteConference(achievement['master_id']);
+                      print("Delete pressed");
+                    },
+                  ),
+                  const Icon(Icons.arrow_forward),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,

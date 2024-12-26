@@ -1,8 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/descfiles/PSdesc.dart';
 import 'package:hod_app/screens/descfiles/bcdesc.dart';
+import 'package:hod_app/screens/descfiles/cadesc.dart';
 import 'package:hod_app/screens/descfiles/confdesc.dart';
+import 'package:hod_app/screens/descfiles/fadesc.dart';
+import 'package:hod_app/screens/descfiles/fddesc.dart';
+import 'package:hod_app/screens/descfiles/ivdesc.dart';
 import 'package:hod_app/screens/descfiles/journaldesc.dart';
+import 'package:hod_app/screens/descfiles/patentdesc.dart';
+import 'package:hod_app/screens/descfiles/sadesc.dart';
+import 'package:hod_app/screens/descfiles/seminardesc.dart';
 import 'package:hod_app/screens/descfiles/wsdesc.dart';
 import 'package:hod_app/screens/repository.dart';
 
@@ -140,6 +148,110 @@ class _AcceptedAndRejectedView extends State<AcceptedAndRejectedView> {
             event['event_type'],
             repository.getEventByMasterId(event['master_id']),
             (details) => BCDesc(details: details),
+          ),
+        );
+      case 'patents':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => PatentDesc(details: details),
+          ),
+        );
+      case 'fdp':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => FDDesc(details: details),
+          ),
+        );
+      case 'seminar':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => SeminarDesc(details: details),
+          ),
+        );
+      case 'clubactivity':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => CADesc(details: details),
+          ),
+        );
+      case 'industrial_visit':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => IVDesc(details: details),
+          ),
+        );
+      case 'faculty_achievements':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => FADesc(details: details),
+          ),
+        );
+      case 'student_achievements':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => SADesc(details: details),
+          ),
+        );
+      case 'professional_societies':
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: navigateToPage(
+            event['event_type'],
+            repository.getEventByMasterId(event['master_id']),
+            (details) => PSDesc(details: details),
           ),
         );
       default:

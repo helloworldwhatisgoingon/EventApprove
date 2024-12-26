@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../descfiles/wsdesc.dart';
 import 'package:hod_app/screens/repository.dart';
 
-Repository repository = Repository();
-
 class WorkshopsView extends StatefulWidget {
   const WorkshopsView({super.key});
 
@@ -12,6 +10,8 @@ class WorkshopsView extends StatefulWidget {
 }
 
 class _WorkshopsViewState extends State<WorkshopsView> {
+  Repository repository = Repository();
+
   @override
   void initState() {
     super.initState();
@@ -21,14 +21,14 @@ class _WorkshopsViewState extends State<WorkshopsView> {
   List<Map<String, dynamic>> workshops = [];
 
   Future<void> fetchEvent() async {
-    final _conf = await repository.fetchEvents('workshop');
+    final conf = await repository.fetchEvents('workshop');
 
     // Filter the conferences where 'approval' is null
-    final filteredWorkshop =
-        _conf.where((workshop) => workshop['approval'] == null).toList();
+    final filteredEvent =
+        conf.where((event) => event['approval'] == null).toList();
 
     setState(() {
-      workshops = filteredWorkshop;
+      workshops = filteredEvent;
     });
   }
 

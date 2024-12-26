@@ -54,4 +54,54 @@ class Utility {
     }
     return null;
   }
+
+  Widget buildDetailRow(String label, String value, BuildContext context,
+      {bool isDocumentType = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              "$label:",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Visibility(
+              visible: !isDocumentType,
+              replacement: Align(
+                alignment: Alignment.centerLeft,
+                child: ElevatedButton(
+                  onPressed: () {
+                    viewDocument(
+                      value,
+                      label,
+                      context,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Document downloaded successfully!"),
+                      ),
+                    );
+                  },
+                  child: const Text("Download Attachment"),
+                ),
+              ),
+              child: Text(
+                value,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

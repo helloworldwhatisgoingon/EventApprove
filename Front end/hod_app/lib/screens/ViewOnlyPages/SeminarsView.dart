@@ -1,51 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/repository.dart';
 import '../descfiles/seminardesc.dart';
 
-class SeminarsView extends StatelessWidget {
+class SeminarsView extends StatefulWidget {
   const SeminarsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Sample seminar data
-    final List<Map<String, String>> seminars = [
-      {
-        "seminarTitle": "Sustainable Development Goals",
-        "mode": "Offline",
-        "brochure": "SDG_Seminar_Brochure.pdf",
-        "date": "2024-05-01 to 2024-05-02",
-        "numDays": "2",
-        "gpsPhotos": "SDG_Seminar_Photos.zip",
-        "report": "SDG_Seminar_Report.pdf",
-        "organizers": "Dr. Green, Dr. Greenfield",
-        "conveners": "Prof. Oak",
-        "feedback": "SDG_Seminar_Feedback.pdf",
-        "participantsList": "SDG_Seminar_Participants.pdf",
-        "certificates": "SDG_Seminar_Certificates.zip",
-        "amountSanctioned": "₹1,50,000",
-        "facultyReceivingAmount": "Prof. Oak",
-        "expenditureReport": "SDG_Seminar_Expenditure.pdf",
-        "speakers": "Dr. John Eco, Dr. Lisa Bloom",
-      },
-      {
-        "seminarTitle": "AI and Ethics",
-        "mode": "Online",
-        "brochure": "AI_Ethics_Seminar_Brochure.pdf",
-        "date": "2024-06-10 to 2024-06-12",
-        "numDays": "3",
-        "gpsPhotos": "AI_Ethics_Seminar_Photos.zip",
-        "report": "AI_Ethics_Seminar_Report.pdf",
-        "organizers": "Dr. Doe, Dr. White",
-        "conveners": "Prof. Black",
-        "feedback": "AI_Ethics_Seminar_Feedback.pdf",
-        "participantsList": "AI_Ethics_Seminar_Participants.pdf",
-        "certificates": "AI_Ethics_Seminar_Certificates.zip",
-        "amountSanctioned": "₹2,00,000",
-        "facultyReceivingAmount": "Prof. Black",
-        "expenditureReport": "AI_Ethics_Seminar_Expenditure.pdf",
-        "speakers": "Dr. Alan Turing, Dr. Ada Lovelace",
-      },
-    ];
+  State<SeminarsView> createState() => _SeminarsViewState();
+}
 
+class _SeminarsViewState extends State<SeminarsView> {
+  Repository repository = Repository();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvent();
+  }
+
+  List<Map<String, dynamic>> seminars = [];
+
+  Future<void> fetchEvent() async {
+    final conf = await repository.fetchEvents('seminar');
+
+    // Filter the conferences where 'approval' is null
+    final filteredEvent =
+        conf.where((event) => event['approval'] == null).toList();
+
+    setState(() {
+      seminars = filteredEvent;
+    });
+  }
+
+  Future<void> updateConference(int conferenceId, bool status) async {
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
+  }
+
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Seminars"),
@@ -59,11 +57,41 @@ class SeminarsView extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(
-                seminar["seminarTitle"]!,
+                seminar["seminartitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text("Mode: ${seminar["mode"]}"),
-              trailing: const Icon(Icons.arrow_forward),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      // Handle red cross action (e.g., mark as canceled)
+                      updateConference(seminar['master_id'], false);
+
+                      print("Red cross pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.check, color: Colors.green),
+                    onPressed: () {
+                      // Handle green tick action (e.g., mark as accepted)
+                      updateConference(seminar['master_id'], true);
+                      print("Green tick pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // Handle delete action (e.g., remove seminar)
+                      deleteConference(seminar['master_id']);
+                      print("Delete pressed");
+                    },
+                  ),
+                  const Icon(Icons.arrow_forward),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,

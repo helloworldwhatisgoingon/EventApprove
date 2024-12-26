@@ -1,5 +1,6 @@
-import 'package:faculty_app/utility.dart';
 import 'package:flutter/material.dart';
+import 'package:faculty_app/utility.dart';
+
 
 Utility utility = Utility();
 

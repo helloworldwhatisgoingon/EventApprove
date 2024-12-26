@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -88,8 +91,43 @@ class _FDPCPState extends State<FDPCP> {
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitFDPDetails() async {
+    String from = _currentFDPDetails["dates.from"];
+    String to = _currentFDPDetails["dates.to"];
+    String datesString =
+        from.isEmpty && to.isEmpty ? "No dates available" : "$from - $to";
     try {
+      final fdpData = await repository.createFDPData(
+        fdpTitle: _currentFDPDetails["fdpTitle"],
+        mode: _currentFDPDetails["mode"],
+        brochurePath: _currentFDPDetails["brochure"],
+        dates: datesString,
+        days: _currentFDPDetails["days"],
+        gpsMediaPath: _currentFDPDetails["gpsMedia"],
+        reportPath: _currentFDPDetails["report"],
+        organizers: _currentFDPDetails["organizers"],
+        conveners: _currentFDPDetails["conveners"],
+        feedbackPath: _currentFDPDetails["feedback"],
+        participantsListPath: _currentFDPDetails["participantsList"],
+        certificatesPath: _currentFDPDetails["certificates"],
+        sanctionedAmount: (_currentFDPDetails["sanctionedAmount"]),
+        facultyReceivingAmount: (_currentFDPDetails["facultyReceivingAmount"]),
+        expenditureReportPath: _currentFDPDetails["expenditureReport"],
+        speakersDetails: _currentFDPDetails["speakersDetails"],
+        sponsorship: _currentFDPDetails["sponsorship"],
+        identifier: 0,
+      );
+
+      log('$fdpData');
+
+      await repository.sendEvent(
+        eventType: "fdp",
+        eventName: _currentFDPDetails["fdpTitle"],
+        additionalData: fdpData,
+      );
+
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(

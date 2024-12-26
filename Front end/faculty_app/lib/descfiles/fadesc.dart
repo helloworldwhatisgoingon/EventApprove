@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:faculty_app/utility.dart';
+
+
+Utility utility = Utility();
 
 class FADesc extends StatelessWidget {
-  final Map<String, String> details;
+  final Map<String, dynamic> details;
 
   const FADesc({super.key, required this.details});
 
@@ -17,60 +21,31 @@ class FADesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Faculty Name", details["facultyName"]!),
-            _buildDetailRow("Designation", details["designation"]!),
-            _buildDetailRow(
-                "Date of Achievement", details["dateOfAchievement"]!),
-            _buildDetailRow("Recognition", details["recognition"]!),
-            _buildDetailRow("Event Name", details["eventName"]!),
-            _buildDetailRow("Award Name", details["awardName"]!),
-            _buildDetailRow(
-                "Awarding Organization", details["awardingOrganization"]!),
-            _buildDetailRow("GPS Photo", details["gpsPhoto"]!),
-            _buildDetailRow("Report", details["report"]!),
-            _buildDetailRow("Proof", details["proof"]!),
-            _buildDetailRow("Certificates", details["certificates"]!),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Attachments downloaded successfully!"),
-                  ),
-                );
-              },
-              child: const Text("Download Attachments"),
-            ),
+            utility.buildDetailRow(
+                "Faculty Name", details["facultyname"]!, context),
+            utility.buildDetailRow(
+                "Designation", details["designation"]!, context),
+            utility.buildDetailRow(
+                "Date of Achievement", details["achievementdate"]!, context),
+            utility.buildDetailRow(
+                "Recognition", details["recognition"]!, context),
+            utility.buildDetailRow(
+                "Event Name", details["eventname"]!, context),
+            utility.buildDetailRow(
+                "Award Name", details["awardname"]!, context),
+            utility.buildDetailRow("Awarding Organization",
+                details["awardingorganization"]!, context),
+            utility.buildDetailRow("GPS Photo", details["gpsphoto"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Report", details["report"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Proof", details["proof"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Certificates", details["certificateproof"]!, context,
+                isDocumentType: true),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

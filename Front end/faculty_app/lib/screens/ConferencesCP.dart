@@ -54,9 +54,9 @@ class _ConferencesCPState extends State<ConferencesCP> {
 
   Future<void> _pickDocument() async {
     final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'], // Restrict to only PDF files
-    );
+        // type: FileType.custom,
+        // allowedExtensions: ['pdf'], // Restrict to only PDF files
+        );
 
     if (result != null) {
       setState(() {

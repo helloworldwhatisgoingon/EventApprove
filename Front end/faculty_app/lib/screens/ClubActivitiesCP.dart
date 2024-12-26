@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -28,7 +29,7 @@ class _ClubActivitiesCPState extends State<ClubActivitiesCP> {
     "Enter Speakers Details"
   ];
 
-  final Map<String, dynamic> _currentConferenceDetails = {
+  final Map<String, dynamic> _currentClubActivityDetails = {
     "clubName": "",
     "activityType": "",
     "title": "",
@@ -67,8 +68,7 @@ class _ClubActivitiesCPState extends State<ClubActivitiesCP> {
 
     if (picked != null) {
       setState(() {
-        _currentConferenceDetails[key] =
-            "${picked.day}/${picked.month}/${picked.year}";
+        _currentClubActivityDetails[key] = picked;
       });
     }
   }
@@ -77,23 +77,49 @@ class _ClubActivitiesCPState extends State<ClubActivitiesCP> {
     final result = await FilePicker.platform.pickFiles();
     if (result != null) {
       setState(() {
-        _currentConferenceDetails[key] = result.files.first.path;
+        _currentClubActivityDetails[key] = result.files.first.path;
       });
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitConferenceDetails() async {
     try {
+      final clubActivityData = await repository.createClubActivityData(
+        clubName: _currentClubActivityDetails["clubName"],
+        activityType: _currentClubActivityDetails["activityType"],
+        title: _currentClubActivityDetails["title"],
+        activityDate: _currentClubActivityDetails["date"],
+        numDays: _currentClubActivityDetails["numDays"],
+        gpsMediaPath: _currentClubActivityDetails["gpsMedia"],
+        budget: _currentClubActivityDetails["budget"],
+        reportPath: _currentClubActivityDetails["report"],
+        organizers: _currentClubActivityDetails["organizers"],
+        conveners: _currentClubActivityDetails["conveners"],
+        feedback: _currentClubActivityDetails["feedback"],
+        participantsListPath: _currentClubActivityDetails["participantsList"],
+        certificatesPath: _currentClubActivityDetails["certificates"],
+        speakersDetails: _currentClubActivityDetails["speakersDetails"],
+        identifier: 0,
+      );
+
+      await repository.sendEvent(
+        eventType: "clubactivity",
+        eventName: _currentClubActivityDetails["clubName"],
+        additionalData: clubActivityData,
+      );
+
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Conference details submitted successfully!")),
+            content: Text("Club details details submitted successfully!")),
       );
 
       setState(() {
         _currentStep = 0;
-        _currentConferenceDetails.clear();
+        _currentClubActivityDetails.clear();
         _resetTextController();
       });
     } catch (e) {
@@ -109,7 +135,7 @@ class _ClubActivitiesCPState extends State<ClubActivitiesCP> {
       child: TextField(
         controller: _textController,
         onChanged: (value) {
-          _currentConferenceDetails[key] = value;
+          _currentClubActivityDetails[key] = value;
         },
         decoration: InputDecoration(
           hintText: hintText,
@@ -123,9 +149,9 @@ class _ClubActivitiesCPState extends State<ClubActivitiesCP> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: DropdownButtonFormField<String>(
-        value: _currentConferenceDetails[key] == ""
+        value: _currentClubActivityDetails[key] == ""
             ? null
-            : _currentConferenceDetails[key], // Ensure a non-null value
+            : _currentClubActivityDetails[key], // Ensure a non-null value
         items: options.map((option) {
           return DropdownMenuItem<String>(
             value: option,
@@ -134,7 +160,7 @@ class _ClubActivitiesCPState extends State<ClubActivitiesCP> {
         }).toList(),
         onChanged: (value) {
           setState(() {
-            _currentConferenceDetails[key] = value ?? "";
+            _currentClubActivityDetails[key] = value ?? "";
           });
         },
         decoration: InputDecoration(

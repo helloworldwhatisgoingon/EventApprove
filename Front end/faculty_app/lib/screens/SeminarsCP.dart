@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -85,8 +86,39 @@ class _SeminarsCPState extends State<SeminarsCP> {
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitSeminarDetails() async {
+    String from = _seminarDetails["dates.from"];
+    String to = _seminarDetails["dates.to"];
+    String datesString =
+        from.isEmpty && to.isEmpty ? "No dates available" : "$from - $to";
     try {
+      final seminarData = await repository.createSeminarData(
+        seminarTitle: _seminarDetails["seminarTitle"],
+        mode: _seminarDetails["mode"],
+        dates: datesString,
+        days: _seminarDetails["days"],
+        organizers: _seminarDetails["organizers"],
+        conveners: _seminarDetails["conveners"],
+        speakersDetails: _seminarDetails["speakersDetails"],
+        sanctionedAmount: _seminarDetails["sanctionedAmount"],
+        facultyReceivingAmount: _seminarDetails["facultyReceivingAmount"],
+        identifier: 0, // cardcoded dummy val
+        brochurePath: _seminarDetails["brochure"], // Optional
+        gpsMediaPath: _seminarDetails["gpsMedia"], // Optional
+        reportPath: _seminarDetails["report"], // Optional
+        feedbackPath: _seminarDetails["feedback"], // Optional
+        participantsListPath: _seminarDetails["participantsList"], // Optional
+        certificatesPath: _seminarDetails["certificates"], // Optional
+        expenditureReportPath: _seminarDetails["expenditureReport"], // Optional
+      );
+
+      await repository.sendEvent(
+        eventType: "seminar",
+        eventName: _seminarDetails["seminarTitle"],
+        additionalData: seminarData,
+      );
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(

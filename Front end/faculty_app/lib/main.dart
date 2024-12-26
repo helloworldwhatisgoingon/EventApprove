@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                     buildCategoryCard(
                         "Book- chapter/Published", Icons.menu_book),
                     buildCategoryCard("Patents", Icons.lightbulb),
-                    buildCategoryCard("Events", Icons.event),
+                    // buildCategoryCard("Events", Icons.event),
                     buildCategoryCard("Workshops", Icons.work),
                     buildCategoryCard("FDP", Icons.people),
                     buildCategoryCard("Seminars/Webinars", Icons.web),

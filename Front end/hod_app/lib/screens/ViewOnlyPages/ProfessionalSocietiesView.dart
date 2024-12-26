@@ -1,47 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/repository.dart';
 import '../descfiles/PSdesc.dart';
 
-class ProfessionalSocietiesView extends StatelessWidget {
+class ProfessionalSocietiesView extends StatefulWidget {
   const ProfessionalSocietiesView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Sample professional societies activity data
-    final List<Map<String, String>> professionalSocieties = [
-      {
-        "societyName": "IEEE CS",
-        "mode": "Offline",
-        "activityType": "Workshop",
-        "date": "2024-03-20",
-        "numberOfDays": "2",
-        "gpsPhotosVideos": "IEEEWorkshop_Photos.zip",
-        "budgetSanctioned": "\$2000",
-        "report": "IEEEWorkshop_Report.pdf",
-        "organizers": "Prof. Alice Johnson, Dr. Bob Smith",
-        "conveners": "Prof. John Doe, Prof. Emily Davis",
-        "feedback": "IEEEWorkshop_Feedback.pdf",
-        "participantsList": "IEEEWorkshop_ParticipantsList.pdf",
-        "certificates": "IEEEWorkshop_Certificates.pdf",
-        "speakersDetails": "Dr. Richard Brown, AI Specialist",
-      },
-      {
-        "societyName": "ACM",
-        "mode": "Online",
-        "activityType": "Hackathon",
-        "date": "2024-05-15",
-        "numberOfDays": "3",
-        "gpsPhotosVideos": "ACMHackathon_Photos.zip",
-        "budgetSanctioned": "\$1500",
-        "report": "ACMHackathon_Report.pdf",
-        "organizers": "Dr. Sarah Lee, Prof. Mark Taylor",
-        "conveners": "Prof. Linda Green",
-        "feedback": "ACMHackathon_Feedback.pdf",
-        "participantsList": "ACMHackathon_ParticipantsList.pdf",
-        "certificates": "ACMHackathon_Certificates.pdf",
-        "speakersDetails": "Mr. Alan Turing, Tech Consultant",
-      },
-    ];
+  State<ProfessionalSocietiesView> createState() =>
+      _ProfessionalSocietiesViewState();
+}
 
+class _ProfessionalSocietiesViewState extends State<ProfessionalSocietiesView> {
+  Repository repository = Repository();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvent();
+  }
+
+  List<Map<String, dynamic>> professionalSocieties = [];
+
+  Future<void> fetchEvent() async {
+    final conf = await repository.fetchEvents('professional_societies');
+
+    // Filter the conferences where 'approval' is null
+    final filteredEvent =
+        conf.where((event) => event['approval'] == null).toList();
+
+    setState(() {
+      professionalSocieties = filteredEvent;
+    });
+  }
+
+  Future<void> updateConference(int conferenceId, bool status) async {
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
+  }
+
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Professional Societies Activities"),
@@ -55,12 +58,42 @@ class ProfessionalSocietiesView extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(
-                activity["societyName"]!,
+                activity["societyname"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle:
-                  Text("${activity["activityType"]} (${activity["date"]})"),
-              trailing: const Icon(Icons.arrow_forward),
+              subtitle: Text(
+                  "${activity["activitytype"]} (${activity["activitydate"]})"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      // Handle red cross action (e.g., mark as canceled)
+                      updateConference(activity['master_id'], false);
+
+                      print("Red cross pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.check, color: Colors.green),
+                    onPressed: () {
+                      // Handle green tick action (e.g., mark as accepted)
+                      updateConference(activity['master_id'], true);
+                      print("Green tick pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // Handle delete action (e.g., remove activity)
+                      deleteConference(activity['master_id']);
+                      print("Delete pressed");
+                    },
+                  ),
+                  const Icon(Icons.arrow_forward),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,

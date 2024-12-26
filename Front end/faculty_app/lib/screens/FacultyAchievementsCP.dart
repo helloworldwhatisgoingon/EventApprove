@@ -1,3 +1,4 @@
+import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -61,8 +62,7 @@ class _FacultyAchievementsCPState extends State<FacultyAchievementsCP> {
 
     if (picked != null) {
       setState(() {
-        _currentAchievementDetails[key] =
-            "${picked.day}/${picked.month}/${picked.year}";
+        _currentAchievementDetails[key] = picked;
       });
     }
   }
@@ -76,12 +76,38 @@ class _FacultyAchievementsCPState extends State<FacultyAchievementsCP> {
     }
   }
 
+  Repository repository = Repository();
+
   Future<void> _submitAchievementDetails() async {
     try {
+      final facultyAchievementData =
+          await repository.createFacultyAchievementData(
+        facultyName: _currentAchievementDetails["facultyName"],
+        designation: _currentAchievementDetails["designation"],
+        achievementDate: _currentAchievementDetails["achievementDate"],
+        recognition: _currentAchievementDetails["recognition"],
+        eventName: _currentAchievementDetails["eventName"],
+        awardName: _currentAchievementDetails["awardName"],
+        awardingOrganization:
+            _currentAchievementDetails["awardingOrganization"],
+        gpsPhotoPath: _currentAchievementDetails["gpsPhoto"],
+        reportPath: _currentAchievementDetails["report"],
+        proofPath: _currentAchievementDetails["proof"],
+        certificateProofPath: _currentAchievementDetails["certificateProof"],
+        identifier: 0,
+      );
+
+      await repository.sendEvent(
+        eventType: "faculty_achievements",
+        eventName: _currentAchievementDetails["eventName"],
+        additionalData: facultyAchievementData,
+      );
+
       // Simulate submission
       await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Achievement details submitted successfully!")),
+        const SnackBar(
+            content: Text("Achievement details submitted successfully!")),
       );
 
       setState(() {
@@ -156,16 +182,27 @@ class _FacultyAchievementsCPState extends State<FacultyAchievementsCP> {
         );
       case 3:
         return _buildDropdownField("recognition", [
-          'Best Paper Presentation', 'Key Note Speaker', 'Patent Published', 'Patent Granted', 'Book Published',
-          'Book Chapter/Paper Published in Scopus/WoS', 'Chair', 'Reviewer', 'Best Thesis Award', 'Resource Person',
-          'Mentor', 'SPOC', 'Quality Publication in Q1 or Q2'
+          'Best Paper Presentation',
+          'Key Note Speaker',
+          'Patent Published',
+          'Patent Granted',
+          'Book Published',
+          'Book Chapter/Paper Published in Scopus/WoS',
+          'Chair',
+          'Reviewer',
+          'Best Thesis Award',
+          'Resource Person',
+          'Mentor',
+          'SPOC',
+          'Quality Publication in Q1 or Q2'
         ]);
       case 4:
         return _buildInputField("eventName", "Enter Event Name");
       case 5:
         return _buildInputField("awardName", "Enter Award Name");
       case 6:
-        return _buildInputField("awardingOrganization", "Enter Awarding Organization");
+        return _buildInputField(
+            "awardingOrganization", "Enter Awarding Organization");
       case 7:
         return Padding(
           padding: const EdgeInsets.all(16.0),

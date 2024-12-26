@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/descfiles/wsdesc.dart';
 
 class CADesc extends StatelessWidget {
-  final Map<String, String> details;
+  final Map<String, dynamic> details;
 
   const CADesc({super.key, required this.details});
 
@@ -17,70 +18,35 @@ class CADesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Club Name", details["clubName"]),
-            _buildDetailRow("Activity Type", details["activityType"]),
-            _buildDetailRow("Title", details["title"]),
-            _buildDetailRow("Date", details["date"]),
-            _buildDetailRow("Number of Days", details["numDays"]),
-            _buildDetailRow("GPS Photos/Videos", details["gpsPhotos"]),
-            _buildDetailRow("Budget Sanctioned", details["budgetSanctioned"]),
-            _buildDetailRow("Report", details["report"]),
-            _buildDetailRow("Organizers", details["organizers"]),
-            _buildDetailRow("Conveners", details["conveners"]),
-            _buildDetailRow("Feedback", details["feedback"]),
-            _buildDetailRow("Participants List", details["participantsList"]),
-            _buildDetailRow("Certificates", details["certificates"]),
-            _buildDetailRow("Speakers Details", details["speakers"]),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Attachments downloaded successfully!"),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.download),
-                label: const Text("Download Attachments"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
-              ),
-            ),
+            utility.buildDetailRow("Club Name", details["clubname"], context),
+            utility.buildDetailRow(
+                "Activity Type", details["activitytype"], context),
+            utility.buildDetailRow("Title", details["title"], context),
+            utility.buildDetailRow("Date", details["activitydate"], context),
+            utility.buildDetailRow(
+                "Number of Days", details["numdays"].toString(), context),
+            utility.buildDetailRow(
+                "GPS Photos/Videos", details["gpsmedia"], context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Budget Sanctioned", details["budget"].toString(), context),
+            utility.buildDetailRow("Report", details["report"], context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Organizers", details["organizers"], context),
+            utility.buildDetailRow("Conveners", details["conveners"], context),
+            utility.buildDetailRow("Feedback", details["feedback"], context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Participants List", details["participantslist"], context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Certificates", details["certificates"], context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Speakers Details", details["speakersdetails"], context),
           ],
         ),
-      ),
-    );
-  }
-
-  // Safe detail row builder with default values
-  Widget _buildDetailRow(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value ?? "Not Available",
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:faculty_app/utility.dart';
+
+
+Utility utility = Utility();
 
 class PSDesc extends StatelessWidget {
-  final Map<String, String> details;
+  final Map<String, dynamic> details;
 
   const PSDesc({super.key, required this.details});
 
@@ -17,61 +21,37 @@ class PSDesc extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Society Name", details["societyName"]!),
-            _buildDetailRow("Mode", details["mode"]!),
-            _buildDetailRow("Activity Type", details["activityType"]!),
-            _buildDetailRow("Date", details["date"]!),
-            _buildDetailRow("Number of Days", details["numberOfDays"]!),
-            _buildDetailRow("GPS Photos/Videos", details["gpsPhotosVideos"]!),
-            _buildDetailRow("Budget Sanctioned", details["budgetSanctioned"]!),
-            _buildDetailRow("Report", details["report"]!),
-            _buildDetailRow("Organizers", details["organizers"]!),
-            _buildDetailRow("Conveners", details["conveners"]!),
-            _buildDetailRow("Feedback", details["feedback"]!),
-            _buildDetailRow("Participants List", details["participantsList"]!),
-            _buildDetailRow("Certificates", details["certificates"]!),
-            _buildDetailRow("Speakers Details", details["speakersDetails"]!),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Attachments downloaded successfully!"),
-                  ),
-                );
-              },
-              child: const Text("Download Attachments"),
-            ),
+            utility.buildDetailRow(
+                "Society Name", details["societyname"]!, context),
+            utility.buildDetailRow("Date", details["activitydate"]!, context),
+            utility.buildDetailRow(
+                "Activity Type", details["activitytype"]!, context),
+            utility.buildDetailRow(
+                "Event Type", details["eventtype"]!, context),
+            utility.buildDetailRow(
+                "Number of Days", details["numberofdays"].toString(), context),
+            utility.buildDetailRow(
+                "GPS Photos/Videos", details["gpsphotosvideos"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow("Budget Sanctioned",
+                details["budgetsanctioned"].toString(), context),
+            utility.buildDetailRow("Report", details["eventreport"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Organizers", details["organizers"]!, context),
+            utility.buildDetailRow("Conveners", details["conveners"]!, context),
+            utility.buildDetailRow("Feedback", details["feedback"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Participants List", details["participantslist"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Certificates", details["certificates"]!, context,
+                isDocumentType: true),
+            utility.buildDetailRow(
+                "Speakers Details", details["speakerdetails"]!, context),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }

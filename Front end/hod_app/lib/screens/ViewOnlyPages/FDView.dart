@@ -1,53 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/repository.dart';
 import '../descfiles/fddesc.dart';
 
-class FDView extends StatelessWidget {
+class FDView extends StatefulWidget {
   const FDView({super.key});
+
+  @override
+  State<FDView> createState() => _FDViewState();
+}
+
+class _FDViewState extends State<FDView> {
+  Repository repository = Repository();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvent();
+  }
+
+  List<Map<String, dynamic>> fdps = [];
+
+  Future<void> fetchEvent() async {
+    final conf = await repository.fetchEvents('fdp');
+
+    // Filter the conferences where 'approval' is null
+    final filteredEvent =
+        conf.where((event) => event['approval'] == null).toList();
+
+    setState(() {
+      fdps = filteredEvent;
+    });
+  }
+
+  Future<void> updateConference(int conferenceId, bool status) async {
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
+  }
+
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Sample FDP data
-    final List<Map<String, String>> fdps = [
-      {
-        "fdpTitle": "Advanced AI Techniques",
-        "mode": "Offline",
-        "brochure": "AI_FDP_Brochure.pdf",
-        "date": "2024-03-10 to 2024-03-15",
-        "numDays": "5",
-        "gpsPhotos": "AI_FDP_Photos.zip",
-        "report": "AI_FDP_Report.pdf",
-        "organizers": "Dr. A, Dr. B",
-        "conveners": "Prof. X",
-        "feedback": "AI_FDP_Feedback.pdf",
-        "participantsList": "AI_FDP_Participants.pdf",
-        "certificates": "AI_FDP_Certificates.zip",
-        "amountSanctioned": "₹2,00,000",
-        "facultyReceivingAmount": "Prof. X",
-        "expenditureReport": "AI_FDP_Expenditure.pdf",
-        "speakers": "Dr. John Doe, Dr. Jane Smith",
-        "sponsorship": "TechCorp Inc.",
-      },
-      {
-        "fdpTitle": "Cybersecurity Essentials",
-        "mode": "Online",
-        "brochure": "Cybersecurity_FDP_Brochure.pdf",
-        "date": "2024-04-01 to 2024-04-02",
-        "numDays": "2",
-        "gpsPhotos": "Cybersecurity_FDP_Photos.zip",
-        "report": "Cybersecurity_FDP_Report.pdf",
-        "organizers": "Dr. C, Dr. D",
-        "conveners": "Prof. Y",
-        "feedback": "Cybersecurity_FDP_Feedback.pdf",
-        "participantsList": "Cybersecurity_FDP_Participants.pdf",
-        "certificates": "Cybersecurity_FDP_Certificates.zip",
-        "amountSanctioned": "₹1,00,000",
-        "facultyReceivingAmount": "Prof. Y",
-        "expenditureReport": "Cybersecurity_FDP_Expenditure.pdf",
-        "speakers": "Dr. Alice, Dr. Bob",
-        "sponsorship": "SecureNet Pvt. Ltd.",
-      },
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Faculty Development Programs"),
@@ -61,11 +58,41 @@ class FDView extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
               title: Text(
-                fdp["fdpTitle"]!,
+                fdp["fdptitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text("Mode: ${fdp["mode"]}"),
-              trailing: const Icon(Icons.arrow_forward),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      // Handle red cross action (e.g., mark as canceled)
+                      updateConference(fdp['master_id'], false);
+
+                      print("Red cross pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.check, color: Colors.green),
+                    onPressed: () {
+                      // Handle green tick action (e.g., mark as accepted)
+                      updateConference(fdp['master_id'], true);
+                      print("Green tick pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // Handle delete action (e.g., remove fdp)
+                      deleteConference(fdp['master_id']);
+                      print("Delete pressed");
+                    },
+                  ),
+                  const Icon(Icons.arrow_forward),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,

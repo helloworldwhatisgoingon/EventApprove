@@ -1,45 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/repository.dart';
 import '../descfiles/patentdesc.dart';
 
-class PatentsView extends StatelessWidget {
+class PatentsView extends StatefulWidget {
   const PatentsView({super.key});
+
+  @override
+  State<PatentsView> createState() => _PatentsViewState();
+}
+
+class _PatentsViewState extends State<PatentsView> {
+  Repository repository = Repository();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEvent();
+  }
+
+  List<Map<String, dynamic>> patents = [];
+
+  Future<void> fetchEvent() async {
+    final conf = await repository.fetchEvents('patents');
+
+    // Filter the conferences where 'approval' is null
+    final filteredEvent =
+        conf.where((event) => event['approval'] == null).toList();
+
+    setState(() {
+      patents = filteredEvent;
+    });
+  }
+
+  Future<void> updateConference(int conferenceId, bool status) async {
+    await repository.updateEventApproval(conferenceId, status);
+    fetchEvent();
+  }
+
+  Future<void> deleteConference(int masterId) async {
+    await repository.deleteEvent(masterId);
+    fetchEvent();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Sample patent data
-    final List<Map<String, String>> patents = [
-      {
-        "applicationNumber": "12345",
-        "patentNumber": "US987654321",
-        "title": "AI-Based Traffic Management System",
-        "inventors": "Dr. X, Dr. Y",
-        "patenteeName": "Dayananda Sagar University",
-        "filingDate": "2023-01-10",
-        "status": "Granted",
-        "patentCountry": "USA",
-        "publicationDate": "2023-06-15",
-        "abstract":
-            "An AI-powered traffic management system to optimize flow and reduce congestion.",
-        "url": "https://patents.example.com/US987654321",
-        "document": "TrafficAI_Patent.pdf",
-      },
-      {
-        "applicationNumber": "67890",
-        "patentNumber": "IN87654321",
-        "title": "Solar-Powered Water Purification Device",
-        "inventors": "Prof. A, Prof. B",
-        "patenteeName": "Dayananda Sagar University",
-        "filingDate": "2022-03-05",
-        "status": "Published",
-        "patentCountry": "India",
-        "publicationDate": "2022-12-01",
-        "abstract":
-            "A portable solar-powered device designed to purify water in remote areas.",
-        "url": "https://patents.example.com/IN87654321",
-        "document": "SolarWaterPurifier_Patent.pdf",
-      },
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Patents"),
@@ -56,8 +61,38 @@ class PatentsView extends StatelessWidget {
                 patent["title"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text("Application No: ${patent["applicationNumber"]}"),
-              trailing: const Icon(Icons.arrow_forward),
+              subtitle: Text("Application No: ${patent["applicationnumber"]}"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      // Handle red cross action (e.g., mark as canceled)
+                      updateConference(patent['master_id'], false);
+
+                      print("Red cross pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.check, color: Colors.green),
+                    onPressed: () {
+                      // Handle green tick action (e.g., mark as accepted)
+                      updateConference(patent['master_id'], true);
+                      print("Green tick pressed");
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // Handle delete action (e.g., remove patent)
+                      deleteConference(patent['master_id']);
+                      print("Delete pressed");
+                    },
+                  ),
+                  const Icon(Icons.arrow_forward),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,

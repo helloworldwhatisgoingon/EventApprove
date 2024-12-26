@@ -1,7 +1,7 @@
 import base64
 import traceback
 from flask import Blueprint, request, jsonify
-from ..models import Conference, MasterEvent, Event, Journal, BookChapter, Workshop
+from ..models import Conference, MasterEvent, Event, Journal, BookChapter, Workshop, Patent, Fdp, Seminar, ClubActivity, IndustrialVisit, FacultyAchievement, StudentAchievement, ProfessionalSociety
 from .. import db
 from datetime import datetime
 
@@ -13,7 +13,7 @@ def create_event():
     # Handle multipart form data
     data = request.form
     event_type = data.get('event_type')
-    
+
     # Handle file data for BYTEA storage
     document = None
     if 'document' in request.files:
@@ -37,15 +37,25 @@ def create_event():
     # Prepare data for event model
     event_data = {key: value for key, value in data.items() 
                  if key in event_model.__table__.columns.keys()}
-    
+
     # Add document bytes if file was uploaded
     if document:
         event_data['document'] = document
 
     # Encode specific fields as Base64
     fields_to_encode = [
-        'brochure', 'gpsmedia', 'report', 'feedback',
-        'participantslist', 'certificates', 'expenditurereport'
+        "brochure",
+        "gpsmedia",
+        "report",
+        "feedback",
+        "participantslist",
+        "certificates",
+        "expenditurereport",
+        "gpsphoto",
+        "proof",
+        "certificateproof",
+        'gpsphotosvideos',
+        'eventreport'
     ]
     for field in fields_to_encode:
         if field in request.files:
@@ -72,7 +82,7 @@ def create_event():
 @bp.route('', methods=['GET'])
 def get_events():
     event_type = request.args.get('event_type')
-    
+
     try:
         event_model = get_event_model(event_type)
     except ValueError as e:
@@ -88,34 +98,31 @@ def get_events():
     )
     results = query.all()
 
+    # List of document fields that need base64 encoding
+    document_fields = [
+        "brochure",
+        "gpsmedia",
+        "report",
+        "feedback",
+        "participantslist",
+        "certificates",
+        "expenditurereport",
+        "document",
+        "gpsphoto",
+        "proof",
+        "certificateproof",
+        "gpsphotosvideos",
+        "eventreport",
+    ]
+
     data = []
     for event, approval in results:
         event_data = event.to_dict()
 
-        # Convert bytes to base64 if document exists
-        if 'brochure' in event_data and event_data['brochure'] is not None:
-            event_data['brochure'] = base64.b64encode(event_data['brochure']).decode('utf-8')
-
-        if 'gpsmedia' in event_data and event_data['gpsmedia'] is not None:
-            event_data['gpsmedia'] = base64.b64encode(event_data['gpsmedia']).decode('utf-8')
-
-        if 'report' in event_data and event_data['report'] is not None:
-            event_data['report'] = base64.b64encode(event_data['report']).decode('utf-8')
-
-        if 'feedback' in event_data and event_data['feedback'] is not None:
-            event_data['feedback'] = base64.b64encode(event_data['feedback']).decode('utf-8')
-
-        if 'participantslist' in event_data and event_data['participantslist'] is not None:
-            event_data['participantslist'] = base64.b64encode(event_data['participantslist']).decode('utf-8')
-
-        if 'certificates' in event_data and event_data['certificates'] is not None:
-            event_data['certificates'] = base64.b64encode(event_data['certificates']).decode('utf-8')
-
-        if 'expenditurereport' in event_data and event_data['expenditurereport'] is not None:
-            event_data['expenditurereport'] = base64.b64encode(event_data['expenditurereport']).decode('utf-8')
-        
-        if 'document' in event_data and event_data['document'] is not None:
-            event_data['document'] = base64.b64encode(event_data['document']).decode('utf-8')
+        # Convert all document fields to base64 if they exist and are not None
+        for field in document_fields:
+            if field in event_data and event_data[field] is not None:
+                event_data[field] = base64.b64encode(event_data[field]).decode('utf-8')
 
         # Update approval data
         event_data.update({'approval': approval})
@@ -171,8 +178,19 @@ def get_event_by_master_id(master_id):
 
             # Perform Base64 encoding for specific fields if they exist
             document_fields = [
-                'brochure', 'gpsmedia', 'report', 'feedback',
-                'participantslist', 'certificates', 'expenditurereport', 'document'
+                "brochure",
+                "gpsmedia",
+                "report",
+                "feedback",
+                "participantslist",
+                "certificates",
+                "expenditurereport",
+                "document",
+                "gpsphoto",
+                "proof",
+                "certificateproof",
+                'gpsphotosvideos',
+                'eventreport'
             ]
             for field in document_fields:
                 if field in event_dict and event_dict[field] is not None:
@@ -186,7 +204,6 @@ def get_event_by_master_id(master_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-    
 # Get all the events from master table
 @bp.route('/all', methods=['GET'])
 def get_all_master_events():
@@ -230,7 +247,7 @@ def update_event_approval():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
 @bp.route('/<int:master_id>', methods=['DELETE'])
 def delete_event(master_id):
     try:
@@ -263,5 +280,21 @@ def get_event_model(event_type):
             return BookChapter
         case 'workshop':
             return Workshop
+        case 'patents':
+            return Patent
+        case 'fdp':
+            return Fdp
+        case 'seminar':
+            return Seminar
+        case 'clubactivity':
+            return ClubActivity
+        case 'industrial_visit':
+            return IndustrialVisit
+        case 'faculty_achievements':
+            return FacultyAchievement
+        case 'student_achievements':
+            return StudentAchievement
+        case 'professional_societies':
+            return ProfessionalSociety
         case _:
             raise ValueError(f"Unknown event type: {event_type}")
