@@ -45,6 +45,7 @@ class Conference(db.Model):
     doiisbn = db.Column(db.String(100), nullable=True)
     document = db.Column(db.LargeBinary, nullable=True, default=None)
     prooflink = db.Column(db.String(255), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -59,7 +60,8 @@ class Conference(db.Model):
             'publisher': self.publisher,
             'doiisbn': self.doiisbn,
             'document': self.document if self.document else None,  # Return actual bytes instead of bool
-            'prooflink': self.prooflink
+            'prooflink': self.prooflink,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class Journal(db.Model):
@@ -80,6 +82,8 @@ class Journal(db.Model):
     quartile = db.Column(db.String(50), nullable=True)
     identifier = db.Column(db.Integer, nullable=False, autoincrement=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
+
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -98,7 +102,8 @@ class Journal(db.Model):
             'impactfactor': float(self.impactfactor) if self.impactfactor else None,
             'quartile': self.quartile,
             'identifier': self.identifier,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class BookChapter(db.Model):
@@ -117,6 +122,7 @@ class BookChapter(db.Model):
     prooflink = db.Column(db.String(255), nullable=True)
     identifier = db.Column(db.Integer, nullable=False, autoincrement=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -133,7 +139,8 @@ class BookChapter(db.Model):
             'document': self.document if self.document else None,
             'prooflink': self.prooflink,
             'identifier': self.identifier,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
     
 class Workshop(db.Model):
@@ -158,6 +165,7 @@ class Workshop(db.Model):
     speakersdetails = db.Column(db.Text, nullable=True)
     identifier = db.Column(db.Integer, nullable=False, autoincrement=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -180,7 +188,8 @@ class Workshop(db.Model):
             'expenditurereport': self.expenditurereport if self.expenditurereport else None,
             'speakersdetails': self.speakersdetails,
             'identifier': self.identifier,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
     
 class Patent(db.Model):
@@ -201,6 +210,7 @@ class Patent(db.Model):
     document = db.Column(db.LargeBinary, nullable=True, default=None)
     identifier = db.Column(db.Integer, nullable=False, autoincrement=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -219,7 +229,8 @@ class Patent(db.Model):
             'url': self.url,
             'document': self.document if self.document else None,
             'identifier': self.identifier,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class Fdp(db.Model):
@@ -245,6 +256,7 @@ class Fdp(db.Model):
     sponsorship = db.Column(db.Text, nullable=True)
     identifier = db.Column(db.Integer, nullable=False, autoincrement=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -268,7 +280,8 @@ class Fdp(db.Model):
             'speakersdetails': self.speakersdetails,
             'sponsorship': self.sponsorship,
             'identifier': self.identifier,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class Seminar(db.Model):
@@ -293,6 +306,7 @@ class Seminar(db.Model):
     speakersdetails = db.Column(db.Text, nullable=True)
     identifier = db.Column(db.Integer, nullable=False, autoincrement=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -315,7 +329,8 @@ class Seminar(db.Model):
             'expenditurereport': self.expenditurereport if self.expenditurereport else None,
             'speakersdetails': self.speakersdetails,
             'identifier': self.identifier,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class ClubActivity(db.Model):
@@ -337,6 +352,7 @@ class ClubActivity(db.Model):
     certificates = db.Column(db.LargeBinary, nullable=True)
     speakersdetails = db.Column(db.Text, nullable=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -356,7 +372,8 @@ class ClubActivity(db.Model):
             'participantslist': self.participantslist if self.participantslist else None,
             'certificates': self.certificates if self.certificates else None,
             'speakersdetails': self.speakersdetails,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None    
         }
 
 class IndustrialVisit(db.Model):
@@ -378,6 +395,7 @@ class IndustrialVisit(db.Model):
     certificates = db.Column(db.LargeBinary, nullable=True)
     speakersdetails = db.Column(db.Text, nullable=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -397,7 +415,8 @@ class IndustrialVisit(db.Model):
             'participantslist': self.participantslist if self.participantslist else None,
             'certificates': self.certificates if self.certificates else None,
             'speakersdetails': self.speakersdetails,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class FacultyAchievement(db.Model):
@@ -416,6 +435,7 @@ class FacultyAchievement(db.Model):
     proof = db.Column(db.LargeBinary, nullable=True)
     certificateproof = db.Column(db.LargeBinary, nullable=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -432,7 +452,8 @@ class FacultyAchievement(db.Model):
             'report': self.report if self.report else None,
             'proof': self.proof if self.proof else None,
             'certificateproof': self.certificateproof if self.certificateproof else None,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class StudentAchievement(db.Model):
@@ -451,6 +472,7 @@ class StudentAchievement(db.Model):
     gpsphoto = db.Column(db.LargeBinary, nullable=True)
     report = db.Column(db.LargeBinary, nullable=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -467,7 +489,8 @@ class StudentAchievement(db.Model):
             'certificateproof': self.certificateproof if self.certificateproof else None,
             'gpsphoto': self.gpsphoto if self.gpsphoto else None,
             'report': self.report if self.report else None,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 class ProfessionalSociety(db.Model):
@@ -489,6 +512,7 @@ class ProfessionalSociety(db.Model):
     certificates = db.Column(db.LargeBinary, nullable=True)
     speakerdetails = db.Column(db.Text, nullable=True)
     master_id = db.Column(db.Integer, db.ForeignKey('master_event.master_id'), nullable=True)
+    created_date = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp())
 
     def to_dict(self):
         """Convert the object to a dictionary for easy serialization."""
@@ -508,7 +532,8 @@ class ProfessionalSociety(db.Model):
             'participantslist': self.participantslist if self.participantslist else None,
             'certificates': self.certificates if self.certificates else None,
             'speakerdetails': self.speakerdetails,
-            'master_id': self.master_id
+            'master_id': self.master_id,
+            'created_date': self.created_date.isoformat() if self.created_date else None
         }
 
 
@@ -518,6 +543,27 @@ class MasterEvent(db.Model):
     event_name = db.Column(db.String, nullable=False)
     event_type = db.Column(db.String, nullable=False)
     approval = db.Column(db.Boolean, default=None, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
 
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+    
+class Users(db.Model):
+    __tablename__ = 'users'
+
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
+
+    __table_args__ = (
+        db.CheckConstraint(role.in_(['HOD', 'Faculty']), name='check_valid_role'),
+    )
+
+    def to_dict(self):
+        return {
+            'user_id': self.user_id,
+            'username': self.username,
+            'role': self.role
+            # Note: password is intentionally excluded for security
+        }

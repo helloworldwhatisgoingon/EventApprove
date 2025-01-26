@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/appbar.dart';
 import 'package:hod_app/screens/repository.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../descfiles/ivdesc.dart';
 
 class IndustrialVisitsView extends StatefulWidget {
@@ -11,6 +13,12 @@ class IndustrialVisitsView extends StatefulWidget {
 
 class _IndustrialVisitsViewState extends State<IndustrialVisitsView> {
   Repository repository = Repository();
+  final DataFilterService _filterService = DataFilterService();
+  List<Map<String, dynamic>> filteredConferences = [];
+  DateTime? startDate;
+  DateTime? endDate;
+  String searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -21,14 +29,32 @@ class _IndustrialVisitsViewState extends State<IndustrialVisitsView> {
   List<Map<String, dynamic>> industrialVisits = [];
 
   Future<void> fetchEvent() async {
-    final conf = await repository.fetchEvents('industrial_visit');
-
-    // Filter the conferences where 'approval' is null
-    final filteredEvent =
-        conf.where((event) => event['approval'] == null).toList();
-
+    final _conf = await repository.fetchEvents('industrial_visit');
     setState(() {
-      industrialVisits = filteredEvent;
+      industrialVisits = _conf;
+      filteredConferences = _conf;
+    });
+  }
+
+  void applyFilters() {
+    setState(() {
+      filteredConferences = _filterService.filterConferences(
+        industrialVisits,
+        startDate: startDate,
+        endDate: endDate,
+        searchQuery: searchQuery,
+      );
+    });
+  }
+
+  void clearFilters() {
+    setState(() {
+      startDate = null;
+      endDate = null;
+      searchQuery = "";
+      _searchController.clear();
+      filteredConferences =
+          List.from(industrialVisits); // Reset to original data
     });
   }
 
@@ -45,14 +71,28 @@ class _IndustrialVisitsViewState extends State<IndustrialVisitsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Industrial Visits"),
-        backgroundColor: const Color(0xff2F4F6F),
+      appBar: _filterService.buildAppBar(
+        context,
+        _searchController,
+        searchQuery,
+        (value) {
+          setState(() {
+            searchQuery = value;
+            applyFilters();
+          });
+        },
+        startDate,
+        endDate,
+        applyFilters,
+        clearFilters,
+        openDatePicker: openDatePicker,
+        conferences: industrialVisits,
+        filename: 'Industrial Visits',
       ),
       body: ListView.builder(
-        itemCount: industrialVisits.length,
+        itemCount: filteredConferences.length,
         itemBuilder: (context, index) {
-          final visit = industrialVisits[index];
+          final visit = filteredConferences[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
@@ -60,33 +100,63 @@ class _IndustrialVisitsViewState extends State<IndustrialVisitsView> {
                 visit["visittitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text("Date of Visit: ${visit["visitdate"]}"),
-               trailing: Row(
+              subtitle: Row(
+                children: [
+                  Text("Date of Visit: ${visit["visitdate"]}"),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'Faculty: ${visit['username']}',
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
+              trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red),
-                    onPressed: () {
-                      // Handle red cross action (e.g., mark as canceled)
-                      updateConference(visit['master_id'], false);
-
-                      print("Red cross pressed");
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () {
-                      // Handle green tick action (e.g., mark as accepted)
-                      updateConference(visit['master_id'], true);
-                      print("Green tick pressed");
-                    },
-                  ),
+                  if (visit['approval'] == true) ...[
+                    const Icon(Icons.check, color: Colors.green),
+                    const SizedBox(width: 4),
+                    const Text(
+                      "Approved",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ] else if (visit['approval'] == false) ...[
+                    const Icon(Icons.close, color: Colors.red),
+                    const SizedBox(width: 4),
+                    const Text(
+                      "Rejected",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ] else ...[
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      onPressed: () {
+                        updateConference(visit['master_id'], false);
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.check, color: Colors.green),
+                      onPressed: () {
+                        updateConference(visit['master_id'], true);
+                      },
+                    ),
+                  ],
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.black),
                     onPressed: () {
-                      // Handle delete action (e.g., remove visit)
                       deleteConference(visit['master_id']);
-                      print("Delete pressed");
                     },
                   ),
                   const Icon(Icons.arrow_forward),
@@ -104,6 +174,45 @@ class _IndustrialVisitsViewState extends State<IndustrialVisitsView> {
           );
         },
       ),
+    );
+  }
+
+  void openDatePicker() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Date Range'),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: 300,
+            child: SfDateRangePicker(
+              view: DateRangePickerView.month,
+              selectionMode: DateRangePickerSelectionMode.range,
+              onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                if (args.value is PickerDateRange) {
+                  setState(() {
+                    startDate = args.value.startDate;
+                    endDate = args.value.endDate;
+                  });
+                }
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                applyFilters();
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Apply',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

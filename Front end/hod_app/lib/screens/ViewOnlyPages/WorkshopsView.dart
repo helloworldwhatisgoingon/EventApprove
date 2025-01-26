@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/appbar.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../descfiles/wsdesc.dart';
 import 'package:hod_app/screens/repository.dart';
 
@@ -11,6 +13,12 @@ class WorkshopsView extends StatefulWidget {
 
 class _WorkshopsViewState extends State<WorkshopsView> {
   Repository repository = Repository();
+  final DataFilterService _filterService = DataFilterService();
+  List<Map<String, dynamic>> filteredConferences = [];
+  DateTime? startDate;
+  DateTime? endDate;
+  String searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -21,14 +29,31 @@ class _WorkshopsViewState extends State<WorkshopsView> {
   List<Map<String, dynamic>> workshops = [];
 
   Future<void> fetchEvent() async {
-    final conf = await repository.fetchEvents('workshop');
-
-    // Filter the conferences where 'approval' is null
-    final filteredEvent =
-        conf.where((event) => event['approval'] == null).toList();
-
+    final _conf = await repository.fetchEvents('workshop');
     setState(() {
-      workshops = filteredEvent;
+      workshops = _conf;
+      filteredConferences = _conf;
+    });
+  }
+
+  void applyFilters() {
+    setState(() {
+      filteredConferences = _filterService.filterConferences(
+        workshops,
+        startDate: startDate,
+        endDate: endDate,
+        searchQuery: searchQuery,
+      );
+    });
+  }
+
+  void clearFilters() {
+    setState(() {
+      startDate = null;
+      endDate = null;
+      searchQuery = "";
+      _searchController.clear();
+      filteredConferences = List.from(workshops); // Reset to original data
     });
   }
 
@@ -47,14 +72,28 @@ class _WorkshopsViewState extends State<WorkshopsView> {
     // Sample workshop data
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Workshops"),
-        backgroundColor: const Color(0xff2F4F6F),
+      appBar: _filterService.buildAppBar(
+        context,
+        _searchController,
+        searchQuery,
+        (value) {
+          setState(() {
+            searchQuery = value;
+            applyFilters();
+          });
+        },
+        startDate,
+        endDate,
+        applyFilters,
+        clearFilters,
+        openDatePicker: openDatePicker,
+        conferences: workshops,
+        filename: 'Workshops',
       ),
       body: ListView.builder(
-        itemCount: workshops.length,
+        itemCount: filteredConferences.length,
         itemBuilder: (context, index) {
-          final workshop = workshops[index];
+          final workshop = filteredConferences[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
@@ -62,33 +101,63 @@ class _WorkshopsViewState extends State<WorkshopsView> {
                 workshop["workshoptitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text("Mode: ${workshop["mode"]}"),
+              subtitle: Row(
+                children: [
+                  Text("Mode: ${workshop["mode"]}"),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'Faculty: ${workshop['username']}',
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red),
-                    onPressed: () {
-                      // Handle red cross action (e.g., mark as canceled)
-                      updateConference(workshop['master_id'], false);
-
-                      print("Red cross pressed");
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () {
-                      // Handle green tick action (e.g., mark as accepted)
-                      updateConference(workshop['master_id'], true);
-                      print("Green tick pressed");
-                    },
-                  ),
+                  if (workshop['approval'] == true) ...[
+                    const Icon(Icons.check, color: Colors.green),
+                    const SizedBox(width: 4),
+                    const Text(
+                      "Approved",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ] else if (workshop['approval'] == false) ...[
+                    const Icon(Icons.close, color: Colors.red),
+                    const SizedBox(width: 4),
+                    const Text(
+                      "Rejected",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ] else ...[
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      onPressed: () {
+                        updateConference(workshop['master_id'], false);
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.check, color: Colors.green),
+                      onPressed: () {
+                        updateConference(workshop['master_id'], true);
+                      },
+                    ),
+                  ],
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.black),
                     onPressed: () {
-                      // Handle delete action (e.g., remove workshop)
                       deleteConference(workshop['master_id']);
-                      print("Delete pressed");
                     },
                   ),
                   const Icon(Icons.arrow_forward),
@@ -106,6 +175,45 @@ class _WorkshopsViewState extends State<WorkshopsView> {
           );
         },
       ),
+    );
+  }
+
+  void openDatePicker() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Date Range'),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: 300,
+            child: SfDateRangePicker(
+              view: DateRangePickerView.month,
+              selectionMode: DateRangePickerSelectionMode.range,
+              onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                if (args.value is PickerDateRange) {
+                  setState(() {
+                    startDate = args.value.startDate;
+                    endDate = args.value.endDate;
+                  });
+                }
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                applyFilters();
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Apply',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

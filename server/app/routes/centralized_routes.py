@@ -1,7 +1,7 @@
 import base64
 import traceback
 from flask import Blueprint, request, jsonify
-from ..models import Conference, MasterEvent, Event, Journal, BookChapter, Workshop, Patent, Fdp, Seminar, ClubActivity, IndustrialVisit, FacultyAchievement, StudentAchievement, ProfessionalSociety
+from ..models import Conference, MasterEvent, Event, Journal, BookChapter, Workshop, Patent, Fdp, Seminar, ClubActivity, IndustrialVisit, FacultyAchievement, StudentAchievement, ProfessionalSociety, Users
 from .. import db
 from datetime import datetime
 
@@ -78,7 +78,6 @@ def create_event():
         'master_id': master_event.master_id
     })
 
-# get event based on the event_type
 @bp.route('', methods=['GET'])
 def get_events():
     event_type = request.args.get('event_type')
@@ -88,17 +87,20 @@ def get_events():
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 
-    # Join master_event with the event_type-specific table and select specific columns
+    # Use left join with users table to handle null user_ids
     query = (
         db.session.query(
             event_model,  # All fields from the event-specific table
-            MasterEvent.approval  
+            MasterEvent.approval,
+            MasterEvent.user_id,  # Add user_id
+            Users.username,      # Add username
+            Users.role          # Add role
         )
         .join(MasterEvent, MasterEvent.master_id == event_model.master_id)
+        .outerjoin(Users, MasterEvent.user_id == Users.user_id)  # Left join with users table
     )
     results = query.all()
 
-    # List of document fields that need base64 encoding
     document_fields = [
         "brochure",
         "gpsmedia",
@@ -116,7 +118,7 @@ def get_events():
     ]
 
     data = []
-    for event, approval in results:
+    for event, approval, user_id, username, role in results:
         event_data = event.to_dict()
 
         # Convert all document fields to base64 if they exist and are not None
@@ -124,14 +126,17 @@ def get_events():
             if field in event_data and event_data[field] is not None:
                 event_data[field] = base64.b64encode(event_data[field]).decode('utf-8')
 
-        # Update approval data
-        event_data.update({'approval': approval})
+        # Update approval and user data, allowing for null values
+        event_data.update({
+            'approval': approval,
+            'user_id': user_id,
+            'username': username if username else None,
+            'role': role if role else None
+        })
 
-        # Append to result list
         data.append(event_data)
 
     return jsonify(data)
-
 
 @bp.route('/<int:master_id>', methods=['GET'])
 def get_event_by_master_id(master_id):

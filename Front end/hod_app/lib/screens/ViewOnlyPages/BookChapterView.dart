@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/screens/appbar.dart';
 import 'package:hod_app/screens/repository.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../descfiles/bcdesc.dart';
 
 Repository repository = Repository();
@@ -12,6 +14,12 @@ class BookChapterView extends StatefulWidget {
 }
 
 class _BookChapterViewState extends State<BookChapterView> {
+  final DataFilterService _filterService = DataFilterService();
+  List<Map<String, dynamic>> filteredConferences = [];
+  DateTime? startDate;
+  DateTime? endDate;
+  String searchQuery = "";
+  final TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -22,13 +30,30 @@ class _BookChapterViewState extends State<BookChapterView> {
 
   Future<void> fetchEvent() async {
     final _conf = await repository.fetchEvents('bookchapter');
-
-    // Filter the conferences where 'approval' is null
-    final filteredBookChapter =
-        _conf.where((bookChapter) => bookChapter['approval'] == null).toList();
-
     setState(() {
-      bookChapters = filteredBookChapter;
+      bookChapters = _conf;
+      filteredConferences = _conf;
+    });
+  }
+
+  void applyFilters() {
+    setState(() {
+      filteredConferences = _filterService.filterConferences(
+        bookChapters,
+        startDate: startDate,
+        endDate: endDate,
+        searchQuery: searchQuery,
+      );
+    });
+  }
+
+  void clearFilters() {
+    setState(() {
+      startDate = null;
+      endDate = null;
+      searchQuery = "";
+      _searchController.clear();
+      filteredConferences = List.from(bookChapters); // Reset to original data
     });
   }
 
@@ -47,14 +72,28 @@ class _BookChapterViewState extends State<BookChapterView> {
     // Sample book chapter data
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Book Chapters"),
-        backgroundColor: const Color(0xff2F4F6F),
+      appBar: _filterService.buildAppBar(
+        context,
+        _searchController,
+        searchQuery,
+        (value) {
+          setState(() {
+            searchQuery = value;
+            applyFilters();
+          });
+        },
+        startDate,
+        endDate,
+        applyFilters,
+        clearFilters,
+        openDatePicker: openDatePicker,
+        conferences: bookChapters,
+        filename: 'Book Chapters',
       ),
       body: ListView.builder(
-        itemCount: bookChapters.length,
+        itemCount: filteredConferences.length,
         itemBuilder: (context, index) {
-          final chapter = bookChapters[index];
+          final chapter = filteredConferences[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
@@ -62,33 +101,63 @@ class _BookChapterViewState extends State<BookChapterView> {
                 chapter["papertitle"]!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text("Journal: ${chapter["journalname"]}"),
+              subtitle: Row(
+                children: [
+                  Text("Journal: ${chapter["journalname"]}"),
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'Faculty: ${chapter['username']}',
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red),
-                    onPressed: () {
-                      // Handle red cross action (e.g., mark as canceled)
-                      updateConference(chapter['master_id'], false);
-
-                      print("Red cross pressed");
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () {
-                      // Handle green tick action (e.g., mark as accepted)
-                      updateConference(chapter['master_id'], true);
-                      print("Green tick pressed");
-                    },
-                  ),
+                  if (chapter['approval'] == true) ...[
+                    const Icon(Icons.check, color: Colors.green),
+                    const SizedBox(width: 4),
+                    const Text(
+                      "Approved",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ] else if (chapter['approval'] == false) ...[
+                    const Icon(Icons.close, color: Colors.red),
+                    const SizedBox(width: 4),
+                    const Text(
+                      "Rejected",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ] else ...[
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      onPressed: () {
+                        updateConference(chapter['master_id'], false);
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.check, color: Colors.green),
+                      onPressed: () {
+                        updateConference(chapter['master_id'], true);
+                      },
+                    ),
+                  ],
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.black),
                     onPressed: () {
-                      // Handle delete action (e.g., remove chapter)
                       deleteConference(chapter['master_id']);
-                      print("Delete pressed");
                     },
                   ),
                   const Icon(Icons.arrow_forward),
@@ -106,6 +175,45 @@ class _BookChapterViewState extends State<BookChapterView> {
           );
         },
       ),
+    );
+  }
+
+  void openDatePicker() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Date Range'),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: 300,
+            child: SfDateRangePicker(
+              view: DateRangePickerView.month,
+              selectionMode: DateRangePickerSelectionMode.range,
+              onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                if (args.value is PickerDateRange) {
+                  setState(() {
+                    startDate = args.value.startDate;
+                    endDate = args.value.endDate;
+                  });
+                }
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                applyFilters();
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Apply',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
