@@ -98,8 +98,25 @@ class DataFilterService {
       "eventreport",
     ];
 
+    // Filter conferences based on the current filters.
+    final filteredConferences = filterConferences(
+      conferences,
+      startDate: startDate,
+      endDate: endDate,
+      searchQuery: searchQuery,
+    );
+
     return AppBar(
-      title: Text(filename),
+      title: Column(
+        children: [
+          Text(filename),
+          if (filteredConferences.length != conferences.length)
+            Text(
+              "Filtered Results: ${filteredConferences.length}",
+              style: const TextStyle(fontSize: 14),
+            ),
+        ],
+      ),
       backgroundColor: const Color(0xff2F4F6F),
       actions: [
         Container(

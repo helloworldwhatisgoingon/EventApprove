@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hod_app/login.dart';
 import 'package:hod_app/screens/accepted_or_rejected.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Import all the necessary pages
 import 'screens/ViewOnlyPages/IAmarksView.dart';
@@ -55,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     });
   }
@@ -84,7 +86,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
 // HomePage for HOD
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.username});
+  final String? username;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -268,6 +271,21 @@ class Sidebar extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+          SidebarButton(
+            icon: Icons.logout_outlined,
+            label: "Logout",
+            onTap: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('hod');
+              await prefs.setBool('isLogged', false);
+
+              // Navigate back to login screen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
               );
             },
           ),
