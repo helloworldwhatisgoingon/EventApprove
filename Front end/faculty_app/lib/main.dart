@@ -3,8 +3,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:faculty_app/accepted_or_rejected.dart';
+import 'package:faculty_app/login.dart';
 import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/IAmarksCP.dart';
 import 'screens/BookChapterCP.dart';
 import 'screens/ClubActivitiesCP.dart';
@@ -60,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     });
   }
@@ -87,7 +89,8 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.username});
+  final String? username;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -99,7 +102,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Row(
         children: [
-          const Sidebar(),
+          Sidebar(username: widget.username),
           Expanded(
             child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -204,7 +207,8 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Sidebar extends StatelessWidget {
-  const Sidebar({super.key});
+  const Sidebar({super.key, required this.username});
+  final String? username;
 
   @override
   Widget build(BuildContext context) {
@@ -225,14 +229,22 @@ class Sidebar extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(5, 5, 5, 15),
+            child: username != null
+                ? Text(
+                    'Hi $username',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic),
+                    textAlign: TextAlign.center,
+                  )
+                : const Text('Welcome!'),
+          ),
           SidebarButton(
             icon: Icons.dashboard,
             label: "Dashboard",
-            onTap: () {},
-          ),
-          SidebarButton(
-            icon: Icons.create,
-            label: "Create Proposal",
             onTap: () {},
           ),
           SidebarButton(
@@ -255,6 +267,21 @@ class Sidebar extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+          SidebarButton(
+            icon: Icons.logout_outlined,
+            label: "Logout",
+            onTap: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('user');
+              await prefs.setBool('isLoggedIn', false);
+
+              // Navigate back to login screen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
               );
             },
           ),

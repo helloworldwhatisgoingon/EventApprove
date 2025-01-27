@@ -135,7 +135,8 @@ class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: TextField(
-        controller: _textController,
+        controller:
+            TextEditingController(text: _currentSocietyDetails[key] ?? ''),
         onChanged: (value) {
           _currentSocietyDetails[key] = value;
         },
@@ -252,24 +253,10 @@ class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Professional Society Activity'),
+        title: const Text('Professional Society Activity Submission'),
       ),
       body: Column(
         children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const Text(
-                'Professional Society Activity Submission',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
           ProposalStepsWidget(currentStep: _currentStep),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -283,23 +270,46 @@ class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
             ),
           ),
           Expanded(child: _buildCurrentStepContent()),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_currentStep < _stepsQuestions.length - 1) {
-                  setState(() {
-                    _currentStep++;
-                  });
-                } else {
-                  _submitSocietyDetails();
-                }
-              },
-              child: Text(_currentStep < _stepsQuestions.length - 1
-                  ? 'Next Step'
-                  : 'Submit'),
-            ),
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Show either the Previous Step button or an empty SizedBox
+              _currentStep > 0
+                  ? Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_currentStep > 0) {
+                            setState(() {
+                              _currentStep--;
+                            });
+                          }
+                        },
+                        child: Text('Previous Step'),
+                      ),
+                    )
+                  : SizedBox(width: 80), // Empty space to preserve layout
+
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    print(';sdaodk');
+                    if (_currentStep < _stepsQuestions.length - 1) {
+                      setState(() {
+                        _currentStep++;
+                      });
+                    } else {
+                      _submitSocietyDetails();
+                    }
+                  },
+                  child: Text(_currentStep < _stepsQuestions.length - 1
+                      ? 'Next Step'
+                      : 'Submit'),
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

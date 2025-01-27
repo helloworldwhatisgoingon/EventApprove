@@ -4,6 +4,8 @@ from flask import Blueprint, request, jsonify
 from ..models import Conference, MasterEvent, Event, Journal, BookChapter, Workshop, Patent, Fdp, Seminar, ClubActivity, IndustrialVisit, FacultyAchievement, StudentAchievement, ProfessionalSociety, Users
 from .. import db
 from datetime import datetime
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 bp = Blueprint("centralized", __name__, url_prefix="/centralized")
 
@@ -29,7 +31,8 @@ def create_event():
     # Create entry in master_event
     master_event = MasterEvent(
         event_name=data['event_name'],
-        event_type=event_type
+        event_type=event_type,
+        user_id=data['user_id']
     )
     db.session.add(master_event)
     db.session.flush()
@@ -224,6 +227,30 @@ def get_all_master_events():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/allFiltered', methods=['GET'])
+def get_all_master_events_for_user():
+    user_id_param = request.args.get('user_id')  # Get user_id from URL parameters
+
+    try:
+        # Query to fetch all records from the MasterEvent table
+        query = MasterEvent.query
+
+        # Filter by user_id if provided
+        if user_id_param:
+            # Ensure the user_id is cast to an integer for comparison
+            user_id_param = int(user_id_param)  # Convert the string to integer
+            query = query.filter(MasterEvent.user_id == user_id_param)
+
+        master_events = query.all()
+
+        # Convert each record to a dictionary using the to_dict method
+        data = [master_event.to_dict() for master_event in master_events]
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @bp.route('', methods=['PUT'])
 def update_event_approval():
@@ -271,7 +298,74 @@ def delete_event(master_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/login', methods=['POST'])
+def login():
+    try:
+        # Get login data from the request
+        data = request.json
+        username = data.get('username')
+        password = data.get('password')
+        role = data.get('role')
 
+        # Validate required fields
+        if not all([username, password, role]):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Query the database for the user
+        user = Users.query.filter_by(username=username, role=role).first()
+
+        # Check if user exists
+        if not user:
+            return jsonify({'error': 'Invalid credentials or role'}), 404
+
+        # Verify the password
+        if not check_password_hash(user.password, password):
+            return jsonify({'error': 'Incorrect password'}), 401
+
+        # Return success response with all user details
+        return jsonify({
+            'message': 'Login successful',
+            'user': user.to_dict()  # Converts the user object to a dictionary
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    
+@bp.route('/register', methods=['POST'])
+def register():
+    try:
+        # Parse the request JSON
+        data = request.json
+        username = data.get('username')
+        password = data.get('password')
+        role = data.get('role')
+
+        # Validate required fields
+        if not all([username, password, role]):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Validate role
+        if role not in ['HOD', 'Faculty']:
+            return jsonify({'error': f'Invalid role: {role}. Must be "HOD" or "Faculty".'}), 400
+
+        # Check if the username already exists
+        if Users.query.filter_by(username=username).first():
+            return jsonify({'error': 'Username already exists'}), 409
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
+        # Create a new user
+        new_user = Users(username=username, password=hashed_password, role=role)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({'message': 'User registered successfully', 'user_id': new_user.user_id}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
 def get_event_model(event_type):
     """Helper function to return the corresponding model based on event type."""
     match event_type:

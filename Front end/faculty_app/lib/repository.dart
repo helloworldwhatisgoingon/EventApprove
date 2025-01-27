@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:mime/mime.dart';
@@ -5,8 +6,18 @@ import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
 import 'package:faculty_app/config.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Repository {
+  Future<Map<String, dynamic>?> getUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user');
+    if (userData != null) {
+      return jsonDecode(userData);
+    }
+    return null;
+  }
+
   Config config = Config();
 
   Future<void> sendEvent({
@@ -17,6 +28,8 @@ class Repository {
     final dio = Dio();
     final url = '${config.baseURL}/centralized';
 
+    Map<String, dynamic>? userDetails = await getUserDetails();
+
     // Check if there's a MultipartFile in the additionalData
     bool hasFile = additionalData.values.any((value) => value is MultipartFile);
 
@@ -26,6 +39,7 @@ class Repository {
         final formData = FormData.fromMap({
           "event_type": eventType,
           "event_name": eventName,
+          "user_id": userDetails!['user_id'],
           ...additionalData,
         });
 
@@ -793,6 +807,7 @@ class Repository {
     final Dio dio = Dio();
 
     try {
+      Map<String, dynamic>? userDetails = await getUserDetails();
       // Configure Dio (e.g., base URL, headers)
       dio.options.baseUrl =
           '${config.baseURL}/centralized'; // Replace with your API base URL
@@ -801,7 +816,8 @@ class Repository {
       };
 
       // Make the GET request
-      final response = await dio.get('/all');
+      final response =
+          await dio.get('/allFiltered?user_id=${userDetails!['user_id']}');
 
       // Handle response
       if (response.statusCode == 200) {
