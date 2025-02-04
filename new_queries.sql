@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS master_event
 
 
 
-
--- Create table conference
+-- Create table Conference
 CREATE TABLE conference (
     conference_id SERIAL PRIMARY KEY, 
     paperTitle VARCHAR(255) NOT NULL,
@@ -32,12 +31,15 @@ CREATE TABLE conference (
     publisher VARCHAR(255),
     doiIsbn VARCHAR(100),
     document BYTEA DEFAULT NULL,
+    documentName VARCHAR(100),
     proofLink VARCHAR(255),
-    identifier SERIAL,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT conference_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
+    CONSTRAINT conference_master_id_fk FOREIGN KEY (master_id) 
+        REFERENCES master_event (master_id) ON DELETE CASCADE
 );
+
 
 -- Create table bookchapter
 CREATE TABLE bookchapter (
@@ -51,12 +53,15 @@ CREATE TABLE bookchapter (
     publisher VARCHAR(255),
     doi VARCHAR(100),
     document BYTEA DEFAULT NULL,
+    documentName VARCHAR(100),
     proofLink VARCHAR(255),
-    identifier SERIAL,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT bookchapter_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
+    CONSTRAINT bookchapter_master_id_fk FOREIGN KEY (master_id) 
+        REFERENCES master_event (master_id) ON DELETE CASCADE
 );
+
 
 -- Create table fdp
 CREATE TABLE fdp (
@@ -64,25 +69,33 @@ CREATE TABLE fdp (
     fdpTitle VARCHAR(255) NOT NULL,
     mode VARCHAR(50),
     brochure BYTEA DEFAULT NULL,
+    brochureName VARCHAR(255),
     dates VARCHAR(50),
     days VARCHAR(50),
     gpsMedia BYTEA DEFAULT NULL,
+    gpsMediaName VARCHAR(255),
     report BYTEA DEFAULT NULL,
+    reportName VARCHAR(255),
     organizers TEXT,
     conveners TEXT,
     feedback BYTEA DEFAULT NULL,
+    feedbackName VARCHAR(255),
     participantsList BYTEA DEFAULT NULL,
+    participantsListName VARCHAR(255),
     certificates BYTEA DEFAULT NULL,
-    sanctionedAmount NUMERIC(10, 2),
-    facultyReceivingAmount NUMERIC(10, 2),
+    certificatesName VARCHAR(255),
+    sanctionedAmount VARCHAR(100),
+    facultyReceivingAmount VARCHAR(100),
     expenditureReport BYTEA DEFAULT NULL,
+    expenditureReportName VARCHAR(255),
     speakersDetails TEXT,
     sponsorship TEXT,
-    identifier SERIAL,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fdp_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
 );
+
 
 -- Create table journals
 CREATE TABLE journals (
@@ -96,10 +109,11 @@ CREATE TABLE journals (
     publisher VARCHAR(255),
     doiIsbn VARCHAR(100),
     document BYTEA DEFAULT NULL,
+    documentName VARCHAR(255),
     proofLink VARCHAR(255),
-    impactFactor NUMERIC(5, 2),
+    impactFactor VARCHAR(100),
     quartile VARCHAR(50),
-    identifier SERIAL,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT journals_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
@@ -120,7 +134,8 @@ CREATE TABLE patents (
     abstract TEXT,
     url VARCHAR(255),
     document BYTEA DEFAULT NULL,
-    identifier SERIAL,
+    documentName VARCHAR(255),
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT patents_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
@@ -132,20 +147,27 @@ CREATE TABLE seminar (
     seminarTitle VARCHAR(255) NOT NULL,
     mode VARCHAR(50),
     brochure BYTEA DEFAULT NULL,
+    brochureName VARCHAR(255),
     dates VARCHAR(50),
     days VARCHAR(50),
     gpsMedia BYTEA DEFAULT NULL,
+    gpsMediaName VARCHAR(255),
     report BYTEA DEFAULT NULL,
+    reportName VARCHAR(255),
     organizers TEXT,
     conveners TEXT,
     feedback BYTEA DEFAULT NULL,
+    feedbackName VARCHAR(255),
     participantsList BYTEA DEFAULT NULL,
+    participantsListName VARCHAR(255),
     certificates BYTEA DEFAULT NULL,
-    sanctionedAmount NUMERIC(10, 2),
-    facultyReceivingAmount NUMERIC(10, 2),
+    certificatesName VARCHAR(255),
+    sanctionedAmount VARCHAR(100),
+    facultyReceivingAmount VARCHAR(100),
     expenditureReport BYTEA DEFAULT NULL,
+    expenditureReportName VARCHAR(255),
     speakersDetails TEXT,
-    identifier SERIAL,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT seminar_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
@@ -157,20 +179,27 @@ CREATE TABLE workshop (
     workshopTitle VARCHAR(255) NOT NULL,
     mode VARCHAR(50),
     brochure BYTEA DEFAULT NULL,
+    brochureName VARCHAR(255),
     dates VARCHAR(50),
     days VARCHAR(50),
     gpsMedia BYTEA DEFAULT NULL,
+    gpsMediaName VARCHAR(255),
     report BYTEA DEFAULT NULL,
+    reportName VARCHAR(255),
     organizers TEXT,
     conveners TEXT,
     feedback BYTEA DEFAULT NULL,
+    feedbackName VARCHAR(255),
     participantsList BYTEA DEFAULT NULL,
+    participantsListName VARCHAR(255),
     certificates BYTEA DEFAULT NULL,
-    sanctionedAmount NUMERIC(10, 2),
-    facultyReceivingAmount NUMERIC(10, 2),
+    certificatesName VARCHAR(255),
+    sanctionedAmount VARCHAR(100),
+    facultyReceivingAmount VARCHAR(100),
     expenditureReport BYTEA DEFAULT NULL,
+    expenditureReportName VARCHAR(255),
     speakersDetails TEXT,
-    identifier SERIAL,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT workshop_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
@@ -183,16 +212,22 @@ CREATE TABLE clubactivity (
     activityType VARCHAR(100),
     title VARCHAR(255),
     activityDate DATE,
-    numDays INT,
+    numDays VARCHAR(100),  
     gpsMedia BYTEA DEFAULT NULL,
-    budget NUMERIC(10, 2),
+    gpsMediaName VARCHAR(255),  
+    budget VARCHAR(100),  
     report BYTEA DEFAULT NULL,
+    reportName VARCHAR(255), 
     organizers TEXT,
     conveners TEXT,
     feedback BYTEA DEFAULT NULL,
+    feedbackName VARCHAR(255),  
     participantsList BYTEA DEFAULT NULL,
+    participantsListName VARCHAR(255),  
     certificates BYTEA DEFAULT NULL,
+    certificatesName VARCHAR(255),  
     speakersDetails TEXT,
+    identifier VARCHAR(100), 
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT clubactivity_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
@@ -209,13 +244,18 @@ CREATE TABLE faculty_achievements (
     awardName VARCHAR(255),
     awardingOrganization VARCHAR(255),
     gpsPhoto BYTEA DEFAULT NULL,
+    gpsPhotoName VARCHAR(255),
     report BYTEA DEFAULT NULL,
+    reportName VARCHAR(255),
     proof BYTEA DEFAULT NULL,
+    proofName VARCHAR(255),
     certificateProof BYTEA DEFAULT NULL,
+    certificateProofName VARCHAR(255),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT faculty_achievements_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
 );
+
 
 -- Create table industrial_visit
 CREATE TABLE industrial_visit (
@@ -224,20 +264,27 @@ CREATE TABLE industrial_visit (
     industryType VARCHAR(100),
     visitTitle VARCHAR(255),
     visitDate DATE,
-    numDays INT,
+    numDays VARCHAR(100),
     gpsMedia BYTEA DEFAULT NULL,
-    budget NUMERIC(10, 2),
+    gpsMediaName VARCHAR(255),
+    budget VARCHAR(100),
     report BYTEA DEFAULT NULL,
+    reportName VARCHAR(255),
     organizers TEXT,
     conveners TEXT,
     feedback BYTEA DEFAULT NULL,
+    feedbackName VARCHAR(255),
     participantsList BYTEA DEFAULT NULL,
+    participantsListName VARCHAR(255),
     certificates BYTEA DEFAULT NULL,
+    certificatesName VARCHAR(255),
     speakersDetails TEXT,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT industrial_visit_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
 );
+
 
 -- Create table professional_societies
 CREATE TABLE professional_societies (
@@ -246,20 +293,27 @@ CREATE TABLE professional_societies (
     eventType VARCHAR(100),
     activityType VARCHAR(100),
     activityDate DATE,
-    numberOfDays INT,
+    numberOfDays VARCHAR(100),
     gpsPhotosVideos BYTEA DEFAULT NULL,
-    budgetSanctioned NUMERIC(10, 2),
+    gpsPhotosVideosName VARCHAR(255),
+    budgetSanctioned VARCHAR(100),
     eventReport BYTEA DEFAULT NULL,
+    eventReportName VARCHAR(255),
     organizers TEXT,
     conveners TEXT,
     feedback BYTEA DEFAULT NULL,
+    feedbackName VARCHAR(255),
     participantsList BYTEA DEFAULT NULL,
+    participantsListName VARCHAR(255),
     certificates BYTEA DEFAULT NULL,
+    certificatesName VARCHAR(255),
     speakerDetails TEXT,
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT professional_societies_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
 );
+
 
 -- Create table student_achievements
 CREATE TABLE student_achievements (
@@ -273,13 +327,16 @@ CREATE TABLE student_achievements (
     companyOrganization VARCHAR(255),
     recognition VARCHAR(255),
     certificateProof BYTEA DEFAULT NULL,
+    certificateProofName VARCHAR(255),
     gpsPhoto BYTEA DEFAULT NULL,
+    gpsPhotoName VARCHAR(255),
     report BYTEA DEFAULT NULL,
+    reportName VARCHAR(255),
+    identifier VARCHAR(100),
     master_id INTEGER,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT student_achievements_master_id_fk FOREIGN KEY (master_id) REFERENCES master_event (master_id) ON DELETE CASCADE
 );
-
 
 
 
