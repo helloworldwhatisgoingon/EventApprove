@@ -117,7 +117,7 @@ class _FDPCPState extends State<FDPCP> {
         expenditureReportPath: _currentFDPDetails["expenditureReport"],
         speakersDetails: _currentFDPDetails["speakersDetails"],
         sponsorship: _currentFDPDetails["sponsorship"],
-        identifier: 0,
+        identifier: '0',
       );
 
       log('$fdpData');
@@ -150,8 +150,7 @@ class _FDPCPState extends State<FDPCP> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: TextField(
-        controller:
-            TextEditingController(text: _currentFDPDetails[key] ?? ''),
+        controller: TextEditingController(text: _currentFDPDetails[key] ?? ''),
         onChanged: (value) {
           _currentFDPDetails[key] = value;
         },

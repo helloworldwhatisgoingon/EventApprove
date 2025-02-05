@@ -89,6 +89,7 @@ class _ProfessionalSocietiesViewState extends State<ProfessionalSocietiesView> {
         openDatePicker: openDatePicker,
         conferences: professionalSocieties,
         filename: 'Professional Societies',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

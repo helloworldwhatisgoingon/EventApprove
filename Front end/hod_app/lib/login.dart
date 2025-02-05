@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:hod_app/main.dart';
+import 'package:hod_app/screens/accepted.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,60 +15,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool showPassword = false;
-
-  Future<void> validateLogin() async {
-    final username = usernameController.text;
-    final password = passwordController.text;
-
-    if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Username and Password cannot be empty")),
-      );
-      return;
-    }
-
-    try {
-      // Make the API call
-      final response = await http.post(
-        Uri.parse(
-            'http://localhost:5001/centralized/login'), // Replace with your API URL
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': username,
-          'password': password,
-          'role': 'HOD', // Replace with the role you need
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        // Save user details locally
-        final prefs = await SharedPreferences.getInstance();
-
-        await prefs.setString('hod', jsonEncode(data['user']));
-        await prefs.setBool('isLogged', true);
-
-        // Navigate to Home Page
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomePage(
-                    username: data['user']['username'],
-                  )),
-        );
-      } else {
-        final error = jsonDecode(response.body)['error'];
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error ?? "Invalid credentials")),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred: $e")),
-      );
-    }
-  }
 
   Future<void> checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
@@ -211,7 +156,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: validateLogin,
+                        onPressed: () {
+                          repository.validateLogin(context,
+                              usernameController.text, passwordController.text);
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           padding: const EdgeInsets.symmetric(
@@ -283,66 +231,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                           regUsernameController.text;
                                       final regPassword =
                                           regPasswordController.text;
-                                      // final regEmail = regEmailController.text;
 
-                                      // Perform basic validation
                                       if (regUsername.isEmpty ||
                                           regPassword.isEmpty) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
-                                            content: Text(
-                                              'All fields are required.',
-                                            ),
-                                          ),
+                                              content: Text(
+                                                  'All fields are required.')),
                                         );
                                         return;
                                       }
 
-                                      // Call the registration API
-                                      try {
-                                        final response = await http.post(
-                                          Uri.parse(
-                                              'http://localhost:5001/centralized/register'),
-                                          headers: {
-                                            'Content-Type': 'application/json'
-                                          },
-                                          body: jsonEncode({
-                                            'username': regUsername,
-                                            'password': regPassword,
-                                            'role': 'HOD',
-                                            // 'email': regEmail,
-                                          }),
-                                        );
-
-                                        if (response.statusCode == 201) {
-                                          Navigator.pop(
-                                              context); // Close the dialog
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                  'Registration successful!'),
-                                            ),
-                                          );
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Registration failed: ${response.body}',
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text('Error: $e'),
-                                          ),
-                                        );
-                                      }
+                                      // Call the function to register the user
+                                      await repository.registerUser(
+                                          context, regUsername, regPassword);
                                     },
                                     child: const Text('Register'),
                                   ),

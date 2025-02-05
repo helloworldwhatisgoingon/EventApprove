@@ -106,7 +106,7 @@ class _WorkshopsCPState extends State<WorkshopsCP> {
         sanctionedAmount: _currentWorkshopDetails["sanctionedAmount"],
         facultyReceivingAmount:
             _currentWorkshopDetails["facultyReceivingAmount"],
-        identifier: 0, // cardcoded dummy val
+        identifier: '0', // cardcoded dummy val
         brochurePath: _currentWorkshopDetails["brochure"], // Optional
         gpsMediaPath: _currentWorkshopDetails["gpsMedia"], // Optional
         reportPath: _currentWorkshopDetails["report"], // Optional

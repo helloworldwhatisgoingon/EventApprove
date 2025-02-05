@@ -16,15 +16,15 @@ import 'package:hod_app/screens/repository.dart';
 
 Repository repository = Repository();
 
-class AcceptedAndRejectedView extends StatefulWidget {
+class Accepted extends StatefulWidget {
   final bool state;
-  const AcceptedAndRejectedView({super.key, required this.state});
+  const Accepted({super.key, required this.state});
 
   @override
   _AcceptedAndRejectedView createState() => _AcceptedAndRejectedView();
 }
 
-class _AcceptedAndRejectedView extends State<AcceptedAndRejectedView> {
+class _AcceptedAndRejectedView extends State<Accepted> {
   late Future<List<Map<String, dynamic>>> _futureData =
       Future.value([]); // Initialize with an empty list
 

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:faculty_app/accepted_or_rejected.dart';
 import 'package:faculty_app/login.dart';
 import 'package:faculty_app/repository.dart';
@@ -97,40 +96,87 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  Widget _buildDashboardGrid() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Faculty Dashboard',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xff2F4F6F),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 5,
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              children: [
+                buildCategoryCard("IA Marks", Icons.school),
+                buildCategoryCard("Conferences", Icons.business),
+                buildCategoryCard("Journals", Icons.book),
+                buildCategoryCard("Book- chapter/Published", Icons.menu_book),
+                buildCategoryCard("Patents", Icons.lightbulb),
+                buildCategoryCard("Workshops", Icons.work),
+                buildCategoryCard("FDP", Icons.people),
+                buildCategoryCard("Seminars/Webinars", Icons.web),
+                buildCategoryCard("Club Activities", Icons.group),
+                buildCategoryCard("Industrial Visits", Icons.factory),
+                buildCategoryCard("Faculty Major Achievements", Icons.star),
+                buildCategoryCard(
+                    "Student Major Achievements", Icons.emoji_events),
+                buildCategoryCard(
+                    "Professional Societies activities", Icons.account_balance),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildDashboardGrid();
+      case 1:
+        return const AcceptedAndRejectedView();
+      case 2:
+        return const SettingsPage();
+      default:
+        return _buildDashboardGrid();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          Sidebar(username: widget.username),
-          Expanded(
-            child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GridView.count(
-                  crossAxisCount: 5,
-                  mainAxisSpacing: 15,
-                  crossAxisSpacing: 15,
-                  children: [
-                    buildCategoryCard("IA Marks", Icons.school),
-                    buildCategoryCard("Conferences", Icons.business),
-                    buildCategoryCard("Journals", Icons.book),
-                    buildCategoryCard(
-                        "Book- chapter/Published", Icons.menu_book),
-                    buildCategoryCard("Patents", Icons.lightbulb),
-                    // buildCategoryCard("Events", Icons.event),
-                    buildCategoryCard("Workshops", Icons.work),
-                    buildCategoryCard("FDP", Icons.people),
-                    buildCategoryCard("Seminars/Webinars", Icons.web),
-                    buildCategoryCard("Club Activities", Icons.group),
-                    buildCategoryCard("Industrial Visits", Icons.factory),
-                    buildCategoryCard("Faculty Major Achievements", Icons.star),
-                    buildCategoryCard(
-                        "Student Major Achievements", Icons.emoji_events),
-                    buildCategoryCard("Professional Societies activities",
-                        Icons.account_balance),
-                  ],
-                )),
+          Sidebar(
+            username: widget.username,
+            selectedIndex: _currentIndex,
+            onItemSelected: (index) {
+              setState(() => _currentIndex = index);
+            },
+            onLogout: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('user');
+              await prefs.setBool('isLoggedIn', false);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
           ),
+          Expanded(child: _buildMainContent()),
         ],
       ),
     );
@@ -207,85 +253,173 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Sidebar extends StatelessWidget {
-  const Sidebar({super.key, required this.username});
   final String? username;
+  final int selectedIndex;
+  final Function(int) onItemSelected;
+  final VoidCallback onLogout;
+
+  const Sidebar({
+    super.key,
+    required this.username,
+    required this.selectedIndex,
+    required this.onItemSelected,
+    required this.onLogout,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
-      color: const Color(0xff2F4F6F),
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text(
-              'DSU-EventApprove',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(5, 5, 5, 15),
-            child: username != null
-                ? Text(
-                    'Hi $username',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontStyle: FontStyle.italic),
-                    textAlign: TextAlign.center,
-                  )
-                : const Text('Welcome!'),
-          ),
-          SidebarButton(
-            icon: Icons.dashboard,
-            label: "Dashboard",
-            onTap: () {},
-          ),
-          SidebarButton(
-            icon: Icons.list_alt,
-            label: "View Submissions",
-            onTap: () {
-              print('tapped');
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AcceptedAndRejectedView(),
-                ),
-              );
-            },
-          ),
-          SidebarButton(
-            icon: Icons.settings,
-            label: "Settings",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          ),
-          SidebarButton(
-            icon: Icons.logout_outlined,
-            label: "Logout",
-            onTap: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('user');
-              await prefs.setBool('isLoggedIn', false);
-
-              // Navigate back to login screen
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
-            },
+      width: 280,
+      decoration: BoxDecoration(
+        color: const Color(0xff2F4F6F),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 40,
+          ),
+          Column(
+            children: [
+              const Text(
+                'DSU-EventApprove',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              if (username != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Welcome, $username',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 24),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              children: [
+                _SidebarItem(
+                  icon: Icons.dashboard,
+                  label: "Dashboard",
+                  isSelected: selectedIndex == 0,
+                  onTap: () => onItemSelected(0),
+                ),
+                _SidebarItem(
+                  icon: Icons.list_alt,
+                  label: "View Submissions",
+                  isSelected: selectedIndex == 1,
+                  onTap: () => onItemSelected(1),
+                ),
+                _SidebarItem(
+                  icon: Icons.settings,
+                  label: "Settings",
+                  isSelected: selectedIndex == 2,
+                  onTap: () => onItemSelected(2),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: _SidebarItem(
+              icon: Icons.logout_outlined,
+              label: "Logout",
+              isSelected: false,
+              onTap: onLogout,
+              textColor: Colors.red[300],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SidebarItem extends StatelessWidget {
+  const _SidebarItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+    this.textColor,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final Color? textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color:
+                isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent,
+            border: Border(
+              left: BorderSide(
+                color: isSelected ? Colors.white : Colors.transparent,
+                width: 4,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: textColor ?? Colors.white.withOpacity(0.9),
+                size: 20,
+              ),
+              const SizedBox(width: 16),
+              Text(
+                label,
+                style: TextStyle(
+                  color: textColor ?? Colors.white.withOpacity(0.9),
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

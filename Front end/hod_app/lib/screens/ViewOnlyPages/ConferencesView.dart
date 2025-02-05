@@ -87,6 +87,7 @@ class _ConferencesViewState extends State<ConferencesView> {
         openDatePicker: openDatePicker,
         conferences: conferences,
         filename: 'Conferences',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16.0),

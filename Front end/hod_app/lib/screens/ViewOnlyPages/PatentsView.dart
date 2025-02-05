@@ -88,6 +88,7 @@ class _PatentsViewState extends State<PatentsView> {
         openDatePicker: openDatePicker,
         conferences: patents,
         filename: 'Patents',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

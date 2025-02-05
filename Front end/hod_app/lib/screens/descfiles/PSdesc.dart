@@ -11,7 +11,7 @@ class PSDesc extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Professional Society Activity Details"),
-        backgroundColor: const Color(0xff2F4F6F),
+        backgroundColor: const Color(0xffcc9f1f),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -19,34 +19,43 @@ class PSDesc extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             utility.buildDetailRow(
-                "Society Name", details["societyname"]!, context),
-            utility.buildDetailRow("Date", details["activitydate"]!, context),
+                "Society Name", details["societyname"] ?? "N/A", context),
             utility.buildDetailRow(
-                "Activity Type", details["activitytype"]!, context),
+                "Date", details["activitydate"] ?? "N/A", context),
             utility.buildDetailRow(
-                "Event Type", details["eventtype"]!, context),
+                "Activity Type", details["activitytype"] ?? "N/A", context),
             utility.buildDetailRow(
-                "Number of Days", details["numberofdays"].toString(), context),
-            utility.buildDetailRow(
-                "GPS Photos/Videos", details["gpsphotosvideos"]!, context,
-                isDocumentType: true),
+                "Event Type", details["eventtype"] ?? "N/A", context),
+            utility.buildDetailRow("Number of Days",
+                details["numberofdays"]?.toString() ?? "N/A", context),
+            utility.buildDetailRow("GPS Photos/Videos",
+                details["gpsphotosvideos"] ?? "N/A", context,
+                isDocumentType: true,
+                documentName: details['gpsphotosvideosname'] ?? "Document"),
             utility.buildDetailRow("Budget Sanctioned",
-                details["budgetsanctioned"].toString(), context),
-            utility.buildDetailRow("Report", details["eventreport"]!, context,
-                isDocumentType: true),
+                details["budgetsanctioned"]?.toString() ?? "N/A", context),
             utility.buildDetailRow(
-                "Organizers", details["organizers"]!, context),
-            utility.buildDetailRow("Conveners", details["conveners"]!, context),
-            utility.buildDetailRow("Feedback", details["feedback"]!, context,
-                isDocumentType: true),
+                "Report", details["eventreport"] ?? "N/A", context,
+                isDocumentType: true,
+                documentName: details['eventreportname'] ?? "Document"),
             utility.buildDetailRow(
-                "Participants List", details["participantslist"]!, context,
-                isDocumentType: true),
+                "Organizers", details["organizers"] ?? "N/A", context),
             utility.buildDetailRow(
-                "Certificates", details["certificates"]!, context,
-                isDocumentType: true),
+                "Conveners", details["conveners"] ?? "N/A", context),
             utility.buildDetailRow(
-                "Speakers Details", details["speakerdetails"]!, context),
+                "Feedback", details["feedback"] ?? "N/A", context,
+                isDocumentType: true,
+                documentName: details['feedbackname'] ?? "Document"),
+            utility.buildDetailRow("Participants List",
+                details["participantslist"] ?? "N/A", context,
+                isDocumentType: true,
+                documentName: details['participantslistname'] ?? "Document"),
+            utility.buildDetailRow(
+                "Certificates", details["certificates"] ?? "N/A", context,
+                isDocumentType: true,
+                documentName: details['certificatesname'] ?? "Document"),
+            utility.buildDetailRow("Speakers Details",
+                details["speakerdetails"] ?? "N/A", context),
           ],
         ),
       ),

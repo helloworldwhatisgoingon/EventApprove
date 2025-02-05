@@ -1,6 +1,11 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:hod_app/main.dart';
 import 'package:hod_app/screens/config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Repository {
   Config config = Config();
@@ -303,6 +308,88 @@ class Repository {
         print("Error fetching data: $e");
       }
       rethrow;
+    }
+  }
+
+  Future<void> validateLogin(
+      BuildContext context, String username, String password) async {
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Username and Password cannot be empty")),
+      );
+      return;
+    }
+
+    try {
+      // Make the API call
+      final response = await http.post(
+        Uri.parse(
+            '${config.baseURL}/centralized/login'), // Replace with your API URL
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+          'role': 'HOD', // Replace with the role you need
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Save user details locally
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setString('hod', jsonEncode(data['user']));
+        await prefs.setBool('isLogged', true);
+
+        // Navigate to Home Page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(
+                    username: data['user']['username'],
+                  )),
+        );
+      } else {
+        final error = jsonDecode(response.body)['error'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error ?? "Invalid credentials")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred: $e")),
+      );
+    }
+  }
+
+  Future<void> registerUser(
+      BuildContext context, String username, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${config.baseURL}/centralized/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+          'role': 'HOD',
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        Navigator.pop(context); // Close the dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 }

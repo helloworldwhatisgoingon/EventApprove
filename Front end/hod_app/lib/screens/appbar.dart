@@ -10,13 +10,38 @@ class DataFilterService {
     DateTime? endDate,
     String searchQuery = "",
   }) {
+    List<String> ignoredFields = [
+      "brochure",
+      "gpsmedia",
+      "report",
+      "feedback",
+      "participantslist",
+      "certificates",
+      "expenditurereport",
+      "document",
+      "gpsphoto",
+      "proof",
+      "certificateproof",
+      "gpsphotosvideos",
+      "eventreport",
+    ];
+
     return conferences.where((conference) {
+      // Skip ignored fields in each conference
+      final filteredConference = Map.from(conference);
+      ignoredFields.forEach((ignoredField) {
+        filteredConference.remove(ignoredField);
+      });
+
       final publicationDate = DateTime.parse(conference['created_date']);
       final isWithinDateRange =
           (startDate == null || publicationDate.isAfter(startDate)) &&
               (endDate == null || publicationDate.isBefore(endDate));
-      final matchesQuery = conference.values.any((value) =>
+
+      // Filter based on the remaining fields, excluding ignored ones.
+      final matchesQuery = filteredConference.values.any((value) =>
           value.toString().toLowerCase().contains(searchQuery.toLowerCase()));
+
       return isWithinDateRange && matchesQuery;
     }).toList();
   }
@@ -81,7 +106,10 @@ class DataFilterService {
       VoidCallback clearFilters,
       {required VoidCallback openDatePicker,
       required List<Map<String, dynamic>> conferences,
-      required filename}) {
+      required filename,
+      required VoidCallback onRefresh}) {
+    // Added onRefresh parameter
+
     List<String> ignoredFields = [
       "brochure",
       "gpsmedia",
@@ -117,7 +145,7 @@ class DataFilterService {
             ),
         ],
       ),
-      backgroundColor: const Color(0xff2F4F6F),
+      backgroundColor: const Color(0xffcc9f1f),
       actions: [
         Container(
           margin: const EdgeInsets.only(right: 16),
@@ -161,6 +189,11 @@ class DataFilterService {
               IconButton(
                 icon: const Icon(Icons.clear, color: Colors.black),
                 onPressed: clearFilters,
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh,
+                    color: Colors.black), // Added refresh button
+                onPressed: onRefresh, // Call the onRefresh function
               ),
             ],
           ),

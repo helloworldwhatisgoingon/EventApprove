@@ -12,16 +12,32 @@ bp = Blueprint("centralized", __name__, url_prefix="/centralized")
 # Create a global event
 @bp.route('', methods=['POST'])
 def create_event():
-    # Handle multipart form data
     data = request.form
     event_type = data.get('event_type')
 
     # Handle file data for BYTEA storage
-    document = None
-    if 'document' in request.files:
-        file = request.files['document']
-        if file:
-            document = file.read()  # This reads the file as bytes for BYTEA storage
+    file_fields = [
+        "document",
+        "brochure",
+        "gpsmedia",
+        "report",
+        "feedback",
+        "participantslist",
+        "certificates",
+        "expenditurereport",
+        "gpsphoto",
+        "proof",
+        "certificateproof",
+        "gpsphotosvideos",
+        "eventreport"
+    ]
+
+    file_data = {}
+    for field in file_fields:
+        if field in request.files:
+            file = request.files[field]
+            if file:
+                file_data[field] = file.read()  # Read as bytes for BYTEA storage
 
     try:
         event_model = get_event_model(event_type)
@@ -39,34 +55,10 @@ def create_event():
 
     # Prepare data for event model
     event_data = {key: value for key, value in data.items() 
-                 if key in event_model.__table__.columns.keys()}
+                  if key in event_model.__table__.columns.keys()}
 
-    # Add document bytes if file was uploaded
-    if document:
-        event_data['document'] = document
-
-    # Encode specific fields as Base64
-    fields_to_encode = [
-        "brochure",
-        "gpsmedia",
-        "report",
-        "feedback",
-        "participantslist",
-        "certificates",
-        "expenditurereport",
-        "gpsphoto",
-        "proof",
-        "certificateproof",
-        'gpsphotosvideos',
-        'eventreport'
-    ]
-    for field in fields_to_encode:
-        if field in request.files:
-            file = request.files[field]
-            if file:
-                event_data[field] = base64.b64encode(file.read()).decode('utf-8')
-        elif field in event_data and event_data[field] is not None:
-            event_data[field] = base64.b64encode(event_data[field].encode()).decode('utf-8')
+    # Add file data (raw bytes) to event_data
+    event_data.update(file_data)
 
     # Create entry in event_type-specific table
     event = event_model(

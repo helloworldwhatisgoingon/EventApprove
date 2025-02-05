@@ -96,7 +96,7 @@ class _PatentsCPState extends State<PatentsCP> {
         url: _currentPatentDetails["url"],
         documentPath:
             _currentPatentDetails["document"], // Optional, can be null
-        identifier: 0,
+        identifier: '0',
       );
 
       await repository.sendEvent( 

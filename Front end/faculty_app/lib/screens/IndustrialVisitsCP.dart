@@ -102,7 +102,7 @@ class _IndustrialVisitsCPState extends State<IndustrialVisitsCP> {
         participantsListPath: _currentVisitDetails["participantsList"],
         certificatesPath: _currentVisitDetails["certificates"],
         speakersDetails: _currentVisitDetails["speakersDetails"],
-        identifier: 0,
+        identifier: "0",
       );
 
       await repository.sendEvent(

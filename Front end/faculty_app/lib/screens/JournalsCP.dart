@@ -95,9 +95,7 @@ class _JournalsCPState extends State<JournalsCP> {
         doiIsbn: _currentJournalDetails["doiIsbn"],
         documentPath: _currentJournalDetails["document"],
         proofLink: _currentJournalDetails["proofLink"],
-        impactFactor: _currentJournalDetails["impactFactor"] != null
-            ? double.parse(_currentJournalDetails["impactFactor"])
-            : null,
+        impactFactor: _currentJournalDetails["impactFactor"],
         quartile: _currentJournalDetails["quartile"],
         identifier: _currentJournalDetails["identifier"] ?? "",
       );

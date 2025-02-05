@@ -72,24 +72,17 @@ class _WorkshopsViewState extends State<WorkshopsView> {
     // Sample workshop data
 
     return Scaffold(
-      appBar: _filterService.buildAppBar(
-        context,
-        _searchController,
-        searchQuery,
-        (value) {
-          setState(() {
-            searchQuery = value;
-            applyFilters();
-          });
-        },
-        startDate,
-        endDate,
-        applyFilters,
-        clearFilters,
-        openDatePicker: openDatePicker,
-        conferences: workshops,
-        filename: 'Workshops',
-      ),
+      appBar: _filterService
+          .buildAppBar(context, _searchController, searchQuery, (value) {
+        setState(() {
+          searchQuery = value;
+          applyFilters();
+        });
+      }, startDate, endDate, applyFilters, clearFilters,
+              openDatePicker: openDatePicker,
+              conferences: workshops,
+              filename: 'Workshops',
+              onRefresh: fetchEvent),
       body: ListView.builder(
         itemCount: filteredConferences.length,
         itemBuilder: (context, index) {

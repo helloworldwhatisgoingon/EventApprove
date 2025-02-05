@@ -88,6 +88,7 @@ class _JournalsViewState extends State<JournalsView> {
         openDatePicker: openDatePicker,
         conferences: journalData,
         filename: 'Journals',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

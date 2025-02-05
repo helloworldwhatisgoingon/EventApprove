@@ -89,6 +89,7 @@ class _StudentAchievementsViewState extends State<StudentAchievementsView> {
         openDatePicker: openDatePicker,
         conferences: studentAchievements,
         filename: 'Student Achievements',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

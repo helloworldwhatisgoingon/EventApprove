@@ -18,7 +18,7 @@ class _EventDescState extends State<EventDesc> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Conference Details"),
-        backgroundColor: const Color(0xff2F4F6F),
+        backgroundColor: const Color(0xffcc9f1f),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -42,7 +42,7 @@ class _EventDescState extends State<EventDesc> {
                 final base64Document = widget.details["document"]!;
                 utility.viewDocument(
                   base64Document,
-                  widget.details["papertitle"] ?? 'Document',
+                  widget.details["documentname"] ?? 'unknowndoc.pdf',
                   context,
                 ); // Handle document viewing or downloading
               },

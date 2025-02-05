@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -95,7 +97,7 @@ class _ConferencesCPState extends State<ConferencesCP> {
           documentPath: _currentConferenceDetails["document"],
           identifier: _currentConferenceDetails["identifier"] ?? "",
           proofLink: _currentConferenceDetails["proofLink"]);
-
+      log('$conferenceData');
       await repository.sendEvent(
         eventType: "conference",
         eventName: _currentConferenceDetails["paperTitle"],

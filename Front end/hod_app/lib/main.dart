@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hod_app/login.dart';
-import 'package:hod_app/screens/accepted_or_rejected.dart';
+import 'package:hod_app/screens/accepted.dart';
+import 'package:hod_app/screens/rejected.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Import all the necessary pages
@@ -64,13 +65,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xff2F4F6F),
+    return const Scaffold(
+      backgroundColor: Color(0xffcc9f1f),
       body: Center(
         child: AnimatedOpacity(
           opacity: 1.0,
-          duration: const Duration(seconds: 2),
-          child: const Text(
+          duration: Duration(seconds: 2),
+          child: Text(
             'Welcome to DSU-HOD Dashboard!',
             style: TextStyle(
               fontSize: 24,
@@ -94,38 +95,93 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  Widget _buildMainContent() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildDashboardGrid();
+      case 1:
+        return const ReportsView();
+      case 2:
+        return const Accepted(state: true);
+      case 3:
+        return const Rejected(state: false);
+      case 4:
+        return const SettingsView();
+      default:
+        return _buildDashboardGrid();
+    }
+  }
+
+  Widget _buildDashboardGrid() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'HOD Dashboard',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 5,
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              children: [
+                buildCategoryCard("IA Marks", Icons.school),
+                buildCategoryCard("Conferences", Icons.business),
+                buildCategoryCard("Journals", Icons.book),
+                buildCategoryCard("Book- chapter/Published", Icons.menu_book),
+                buildCategoryCard("Patents", Icons.lightbulb),
+                buildCategoryCard("Workshops", Icons.work),
+                buildCategoryCard("FDP", Icons.people),
+                buildCategoryCard("Seminars/Webinars", Icons.web),
+                buildCategoryCard("Club Activities", Icons.group),
+                buildCategoryCard("Industrial Visits", Icons.factory),
+                buildCategoryCard("Faculty Major Achievements", Icons.star),
+                buildCategoryCard(
+                    "Student Major Achievements", Icons.emoji_events),
+                buildCategoryCard(
+                    "Professional Societies activities", Icons.account_balance),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          Sidebar(), // Sidebar
+          HODSidebar(
+            selectedIndex: _currentIndex,
+            onItemSelected: (index) {
+              setState(() => _currentIndex = index);
+            },
+            onLogout: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('hod');
+              await prefs.setBool('isLogged', false);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
+            username: widget.username,
+          ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: GridView.count(
-                crossAxisCount: 3,
-                mainAxisSpacing: 15,
-                crossAxisSpacing: 15,
-                children: [
-                  buildCategoryCard("IA Marks", Icons.school),
-                  buildCategoryCard("Conferences", Icons.business),
-                  buildCategoryCard("Journals", Icons.book),
-                  buildCategoryCard("Book- chapter/Published", Icons.menu_book),
-                  buildCategoryCard("Patents", Icons.lightbulb),
-                  // buildCategoryCard("Events", Icons.event),
-                  buildCategoryCard("Workshops", Icons.work),
-                  buildCategoryCard("FDP", Icons.people),
-                  buildCategoryCard("Seminars/Webinars", Icons.web),
-                  buildCategoryCard("Club Activities", Icons.group),
-                  buildCategoryCard("Industrial Visits", Icons.factory),
-                  buildCategoryCard("Faculty Major Achievements", Icons.star),
-                  buildCategoryCard(
-                      "Student Major Achievements", Icons.emoji_events),
-                  buildCategoryCard("Professional Societies activities",
-                      Icons.account_balance),
-                ],
-              ),
+            child: Container(
+              color: Colors.white,
+              child: _buildMainContent(),
             ),
           ),
         ],
@@ -138,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      color: const Color(0xff405375),
+      color: const Color(0xffcc9f1f),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -205,89 +261,123 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Sidebar with buttons for Accepted and Rejected
-class Sidebar extends StatelessWidget {
+class HODSidebar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemSelected;
+  final VoidCallback onLogout;
+  final String? username;
+
+  const HODSidebar({
+    super.key,
+    required this.selectedIndex,
+    required this.onItemSelected,
+    required this.onLogout,
+    this.username,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
-      color: const Color(0xff2F4F6F),
+      width: 280,
+      decoration: BoxDecoration(
+        color: const Color(0xffcc9f1f),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text(
-              'DSU-HOD Dashboard',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
+          SizedBox(
+            height: 40,
+          ),
+          const Text(
+            'DSU-HOD Dashboard',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
-          SidebarButton(
-            icon: Icons.dashboard,
-            label: "Dashboard",
-            onTap: () {},
-          ),
-          SidebarButton(
-            icon: Icons.list_alt,
-            label: "View Reports",
-            onTap: () {},
-          ),
-          SidebarButton(
-            icon: Icons.check_circle,
-            label: "Accepted", // "Accepted" button
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AcceptedAndRejectedView(
-                    state: true,
-                  ),
+          if (username != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'Welcome, $username',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 16,
+                  fontStyle: FontStyle.italic,
                 ),
-              );
-            },
-          ),
-          SidebarButton(
-            icon: Icons.cancel,
-            label: "Rejected", // "Rejected" button
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AcceptedAndRejectedView(
-                    state: false,
-                  ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 24),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              children: [
+                _SidebarItem(
+                  icon: Icons.dashboard,
+                  label: "Dashboard",
+                  isSelected: selectedIndex == 0,
+                  onTap: () => onItemSelected(0),
                 ),
-              );
-            },
+                // _SidebarItem(
+                //   icon: Icons.list_alt,
+                //   label: "View Reports",
+                //   isSelected: selectedIndex == 1,
+                //   onTap: () => onItemSelected(1),
+                // ),
+                _SidebarItem(
+                  icon: Icons.check_circle,
+                  label: "Accepted",
+                  isSelected: selectedIndex == 2,
+                  onTap: () => onItemSelected(2),
+                ),
+                _SidebarItem(
+                  icon: Icons.cancel,
+                  label: "Rejected",
+                  isSelected: selectedIndex == 3,
+                  onTap: () => onItemSelected(3),
+                ),
+                _SidebarItem(
+                  icon: Icons.settings,
+                  label: "Settings",
+                  isSelected: selectedIndex == 4,
+                  onTap: () => onItemSelected(4),
+                ),
+              ],
+            ),
           ),
-          SidebarButton(
-            icon: Icons.settings,
-            label: "Settings",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          ),
-          SidebarButton(
-            icon: Icons.logout_outlined,
-            label: "Logout",
-            onTap: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('hod');
-              await prefs.setBool('isLogged', false);
-
-              // Navigate back to login screen
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
-            },
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: _SidebarItem(
+              icon: Icons.logout_outlined,
+              label: "Logout",
+              isSelected: false,
+              onTap: onLogout,
+              textColor: Colors.red,
+            ),
           ),
         ],
       ),
@@ -295,37 +385,132 @@ class Sidebar extends StatelessWidget {
   }
 }
 
-// Sidebar button widget
-class SidebarButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const SidebarButton({
-    super.key,
+class _SidebarItem extends StatelessWidget {
+  const _SidebarItem({
     required this.icon,
     required this.label,
+    required this.isSelected,
     required this.onTap,
+    this.textColor,
   });
+
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 20.0),
-      child: ElevatedButton.icon(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xff405375),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color:
+                isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent,
+            border: Border(
+              left: BorderSide(
+                color: isSelected ? Colors.white : Colors.transparent,
+                width: 4,
+              ),
+            ),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: textColor ?? Colors.white.withOpacity(0.9),
+                size: 20,
+              ),
+              const SizedBox(width: 16),
+              Text(
+                label,
+                style: TextStyle(
+                  color: textColor ?? Colors.white.withOpacity(0.9),
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
-        icon: Icon(icon, color: Colors.white),
-        label: Text(
-          label,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
-        ),
+      ),
+    );
+  }
+}
+
+class ReportsView extends StatelessWidget {
+  const ReportsView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Reports',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xffcc9f1f),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: Center(
+              child: Text(
+                'Reports View Content',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsView extends StatelessWidget {
+  const SettingsView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Settings',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xffcc9f1f),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: Center(
+              child: Text(
+                'Settings View Content',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

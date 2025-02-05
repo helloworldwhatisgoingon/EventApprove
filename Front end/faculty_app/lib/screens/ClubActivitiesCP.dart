@@ -101,7 +101,7 @@ class _ClubActivitiesCPState extends State<ClubActivitiesCP> {
         participantsListPath: _currentClubActivityDetails["participantsList"],
         certificatesPath: _currentClubActivityDetails["certificates"],
         speakersDetails: _currentClubActivityDetails["speakersDetails"],
-        identifier: 0,
+        identifier: '0',
       );
 
       await repository.sendEvent(

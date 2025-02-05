@@ -88,6 +88,7 @@ class _FDViewState extends State<FDView> {
         openDatePicker: openDatePicker,
         conferences: fdps,
         filename: 'Faculty Development Programs',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

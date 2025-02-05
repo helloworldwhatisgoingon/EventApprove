@@ -88,6 +88,7 @@ class _IndustrialVisitsViewState extends State<IndustrialVisitsView> {
         openDatePicker: openDatePicker,
         conferences: industrialVisits,
         filename: 'Industrial Visits',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

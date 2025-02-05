@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:faculty_app/main.dart';
+import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
 import 'package:faculty_app/config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Repository {
   Future<Map<String, dynamic>?> getUserDetails() async {
@@ -145,6 +148,8 @@ class Repository {
         filename: documentPath.split('/').last,
         contentType: contentType,
       );
+
+      data["documentname"] = documentPath.split('\\').last;
     }
 
     return data;
@@ -161,7 +166,7 @@ class Repository {
     String? doiIsbn,
     String? documentPath,
     String? proofLink,
-    double? impactFactor,
+    String? impactFactor,
     String? quartile,
     required String identifier,
   }) async {
@@ -190,6 +195,8 @@ class Repository {
         bytes,
         filename: documentPath.split('/').last,
       );
+
+      data["documentname"] = documentPath.split('\\').last;
     }
 
     return data;
@@ -231,6 +238,8 @@ class Repository {
         bytes,
         filename: documentPath.split('/').last,
       );
+
+      data["documentname"] = documentPath.split('\\').last;
     }
 
     return data;
@@ -249,7 +258,7 @@ class Repository {
     String? abstract,
     String? url,
     String? documentPath,
-    required int identifier,
+    required String identifier,
   }) async {
     final Map<String, dynamic> data = {
       "applicationnumber": applicationNumber,
@@ -276,6 +285,8 @@ class Repository {
         bytes,
         filename: documentPath.split('/').last,
       );
+
+      data["documentname"] = documentPath.split('\\').last;
     }
 
     return data;
@@ -291,7 +302,7 @@ class Repository {
     String? speakersDetails,
     String? sanctionedAmount,
     String? facultyReceivingAmount,
-    int? identifier,
+    String? identifier,
     String? reportPath,
     String? feedbackPath,
     String? participantsListPath,
@@ -318,6 +329,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["brochure"] = MultipartFile.fromBytes(bytes,
           filename: brochurePath.split('/').last);
+      data["brochurename"] = brochurePath.split('\\').last;
     }
 
     if (gpsMediaPath != null) {
@@ -325,6 +337,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["gpsmedia"] = MultipartFile.fromBytes(bytes,
           filename: gpsMediaPath.split('/').last);
+      data["gpsmedianame"] = gpsMediaPath.split('\\').last;
     }
 
     if (reportPath != null) {
@@ -332,6 +345,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["report"] =
           MultipartFile.fromBytes(bytes, filename: reportPath.split('/').last);
+      data["reportname"] = reportPath.split('\\').last;
     }
 
     if (feedbackPath != null) {
@@ -339,6 +353,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["feedback"] = MultipartFile.fromBytes(bytes,
           filename: feedbackPath.split('/').last);
+      data["feedbackname"] = feedbackPath.split('\\').last;
     }
 
     if (participantsListPath != null) {
@@ -346,6 +361,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["participantslist"] = MultipartFile.fromBytes(bytes,
           filename: participantsListPath.split('/').last);
+      data["participantslistname"] = participantsListPath.split('\\').last;
     }
 
     if (certificatesPath != null) {
@@ -353,6 +369,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["certificates"] = MultipartFile.fromBytes(bytes,
           filename: certificatesPath.split('/').last);
+      data["certificatesname"] = certificatesPath.split('\\').last;
     }
 
     if (expenditureReportPath != null) {
@@ -360,6 +377,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["expenditurereport"] = MultipartFile.fromBytes(bytes,
           filename: expenditureReportPath.split('/').last);
+      data["expenditurereportname"] = expenditureReportPath.split('\\').last;
     }
 
     return data;
@@ -375,7 +393,7 @@ class Repository {
     String? speakersDetails,
     String? sanctionedAmount,
     String? facultyReceivingAmount,
-    int? identifier,
+    String? identifier,
     String? reportPath,
     String? feedbackPath,
     String? participantsListPath,
@@ -404,6 +422,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["brochure"] = MultipartFile.fromBytes(bytes,
           filename: brochurePath.split('/').last);
+      data["brochurename"] = brochurePath.split('\\').last;
     }
 
     if (gpsMediaPath != null) {
@@ -411,6 +430,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["gpsmedia"] = MultipartFile.fromBytes(bytes,
           filename: gpsMediaPath.split('/').last);
+      data["gpsmedianame"] = gpsMediaPath.split('\\').last;
     }
 
     if (reportPath != null) {
@@ -418,6 +438,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["report"] =
           MultipartFile.fromBytes(bytes, filename: reportPath.split('/').last);
+      data["reportname"] = reportPath.split('\\').last;
     }
 
     if (feedbackPath != null) {
@@ -425,6 +446,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["feedback"] = MultipartFile.fromBytes(bytes,
           filename: feedbackPath.split('/').last);
+      data["feedbackname"] = feedbackPath.split('\\').last;
     }
 
     if (participantsListPath != null) {
@@ -432,6 +454,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["participantslist"] = MultipartFile.fromBytes(bytes,
           filename: participantsListPath.split('/').last);
+      data["participantslistname"] = participantsListPath.split('\\').last;
     }
 
     if (certificatesPath != null) {
@@ -439,6 +462,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["certificates"] = MultipartFile.fromBytes(bytes,
           filename: certificatesPath.split('/').last);
+      data["certificatesname"] = certificatesPath.split('\\').last;
     }
 
     if (expenditureReportPath != null) {
@@ -446,6 +470,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["expenditurereport"] = MultipartFile.fromBytes(bytes,
           filename: expenditureReportPath.split('/').last);
+      data["expenditurereportname"] = expenditureReportPath.split('\\').last;
     }
 
     return data;
@@ -461,7 +486,7 @@ class Repository {
     String? speakersDetails,
     String? sanctionedAmount,
     String? facultyReceivingAmount,
-    int? identifier,
+    String? identifier,
     String? reportPath,
     String? feedbackPath,
     String? participantsListPath,
@@ -488,6 +513,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["brochure"] = MultipartFile.fromBytes(bytes,
           filename: brochurePath.split('/').last);
+      data["brochurename"] = brochurePath.split('\\').last;
     }
 
     if (gpsMediaPath != null) {
@@ -495,6 +521,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["gpsmedia"] = MultipartFile.fromBytes(bytes,
           filename: gpsMediaPath.split('/').last);
+      data["gpsmedianame"] = gpsMediaPath.split('\\').last;
     }
 
     if (reportPath != null) {
@@ -502,6 +529,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["report"] =
           MultipartFile.fromBytes(bytes, filename: reportPath.split('/').last);
+      data["reportname"] = reportPath.split('\\').last;
     }
 
     if (feedbackPath != null) {
@@ -509,6 +537,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["feedback"] = MultipartFile.fromBytes(bytes,
           filename: feedbackPath.split('/').last);
+      data["feedbackname"] = feedbackPath.split('\\').last;
     }
 
     if (participantsListPath != null) {
@@ -516,6 +545,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["participantslist"] = MultipartFile.fromBytes(bytes,
           filename: participantsListPath.split('/').last);
+      data["participantslistname"] = participantsListPath.split('\\').last;
     }
 
     if (certificatesPath != null) {
@@ -523,6 +553,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["certificates"] = MultipartFile.fromBytes(bytes,
           filename: certificatesPath.split('/').last);
+      data["certificatesname"] = certificatesPath.split('\\').last;
     }
 
     if (expenditureReportPath != null) {
@@ -530,6 +561,7 @@ class Repository {
       final bytes = await file.readAsBytes();
       data["expenditurereport"] = MultipartFile.fromBytes(bytes,
           filename: expenditureReportPath.split('/').last);
+      data["expenditurereportname"] = expenditureReportPath.split('\\').last;
     }
 
     return data;
@@ -550,7 +582,7 @@ class Repository {
     String? participantsListPath,
     String? certificatesPath,
     String? speakersDetails,
-    required int identifier,
+    required String identifier,
   }) async {
     final Map<String, dynamic> data = {
       "clubname": clubName,
@@ -574,6 +606,7 @@ class Repository {
           bytes,
           filename: filePath.split('/').last,
         );
+        data['${key}name'] = filePath.split('\\').last;
       }
     }
 
@@ -601,7 +634,7 @@ class Repository {
     String? participantsListPath,
     String? certificatesPath,
     String? speakersDetails,
-    required int identifier,
+    required String identifier,
   }) async {
     final Map<String, dynamic> data = {
       "companyname": companyName,
@@ -625,6 +658,7 @@ class Repository {
           bytes,
           filename: filePath.split('/').last,
         );
+        data['${key}name'] = filePath.split('\\').last;
       }
     }
 
@@ -649,7 +683,7 @@ class Repository {
     String? reportPath,
     String? proofPath,
     String? certificateProofPath,
-    required int identifier,
+    required String identifier,
   }) async {
     final Map<String, dynamic> data = {
       "facultyname": facultyName,
@@ -670,6 +704,7 @@ class Repository {
           bytes,
           filename: filePath.split('/').last,
         );
+        data['${key}name'] = filePath.split('\\').last;
       }
     }
 
@@ -693,7 +728,7 @@ class Repository {
     String? certificateProofPath,
     String? gpsPhotoPath,
     String? reportPath,
-    required int identifier,
+    required String identifier,
   }) async {
     final Map<String, dynamic> data = {
       "studentnames": studentNames,
@@ -715,6 +750,7 @@ class Repository {
           bytes,
           filename: filePath.split('/').last,
         );
+        data['${key}name'] = filePath.split('\\').last;
       }
     }
 
@@ -740,7 +776,7 @@ class Repository {
     String? participantsListPath,
     String? certificatesPath,
     String? speakerDetails,
-    required int identifier,
+    required String identifier,
   }) async {
     final Map<String, dynamic> data = {
       "societyname": societyName,
@@ -764,6 +800,7 @@ class Repository {
           bytes,
           filename: filePath.split('/').last,
         );
+        data['${key}name'] = filePath.split('\\').last;
       }
     }
 
@@ -834,105 +871,6 @@ class Repository {
     }
   }
 
-  Future<void> submitProposal({
-    required String eventName,
-    required String eventType,
-    required String startDate,
-    required String endDate,
-    required String location,
-    required String faculty,
-    required String timings,
-    required bool approval,
-    String? documentPath,
-  }) async {
-    final String endpoint = "${config.baseURL}/event";
-    final Dio dio = Dio();
-
-    try {
-      final formData = FormData.fromMap({
-        "eventTitle": eventName,
-        "eventType": eventType,
-        "startDate": startDate,
-        "endDate": endDate,
-        "timings": timings,
-        "faculty": faculty,
-        "location": location,
-        "approval": approval,
-        if (documentPath != null)
-          "eventPDF": await MultipartFile.fromFile(
-            documentPath,
-            filename: documentPath.split('/').last,
-          ),
-      });
-      log('$documentPath $eventName $startDate');
-      log(endpoint);
-      final response = await dio.post(endpoint, data: formData);
-
-      if (response.statusCode == 201) {
-        log('success');
-        log('$response');
-      }
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception("Failed to submit proposal: ${response.statusMessage}");
-      }
-    } catch (e) {
-      rethrow; // Pass the exception back to the caller for handling
-    }
-  }
-
-  Future<void> submitConference({
-    required String paperTitle,
-    required String abstract,
-    required String conferenceName,
-    required String publicationLevel,
-    required String publicationDate,
-    required String publisher,
-    required String doiIsbn,
-    String? documentPath,
-    required String proofLink,
-    required String identifier,
-  }) async {
-    final String endpoint = "${config.baseURL}/conference";
-    final Dio dio = Dio();
-
-    try {
-      final formData = FormData.fromMap({
-        "papertitle": paperTitle,
-        "abstract": abstract,
-        "conferencename": conferenceName,
-        "publicationlevel": publicationLevel,
-        "publicationdate": publicationDate,
-        "publisher": publisher,
-        "doiisbn": doiIsbn,
-        "prooflink": proofLink,
-        "identifier": identifier,
-        if (documentPath != null)
-          "document": await MultipartFile.fromFile(
-            documentPath,
-            filename: documentPath.split('/').last,
-          ),
-      });
-
-      log('$documentPath $paperTitle $publicationDate');
-      log(endpoint);
-
-      final response = await dio.post(endpoint, data: formData);
-
-      if (response.statusCode == 201) {
-        log('success');
-        log('$response');
-      }
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(
-            "Failed to submit proposal: \${response.statusMessage}");
-      }
-    } catch (e) {
-      rethrow; // Pass the exception back to the caller for handling
-    }
-  }
-
   Future<List<Map<String, dynamic>>> fetchProposals() async {
     try {
       final String endpoint = "${config.baseURL}/event";
@@ -983,6 +921,89 @@ class Repository {
         print("Error fetching data: $e");
       }
       rethrow;
+    }
+  }
+
+  Future<void> validateLogin(BuildContext context, username, password) async {
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Username and Password cannot be empty")),
+      );
+      return;
+    }
+
+    try {
+      // Make the API call
+      final response = await http.post(
+        Uri.parse(
+            '${config.baseURL}/centralized/login'), // Replace with your API URL
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+          'role': 'Faculty', // Replace with the role you need
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Save user details locally
+        final prefs = await SharedPreferences.getInstance();
+        log('${data['user']}');
+        log('$data');
+
+        await prefs.setString('user', jsonEncode(data['user']));
+        await prefs.setBool('isLoggedIn', true);
+
+        // Navigate to Home Page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(
+                    username: data['user']['username'],
+                  )),
+        );
+      } else {
+        final error = jsonDecode(response.body)['error'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error ?? "Invalid credentials")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred: $e")),
+      );
+    }
+  }
+
+  Future<void> registerUser(
+      BuildContext context, String username, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${config.baseURL}/centralized/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+          'role': 'Faculty',
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        Navigator.pop(context); // Close the dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 }

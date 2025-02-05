@@ -11,7 +11,7 @@ class PatentDesc extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Patent Details"),
-        backgroundColor: const Color(0xff2F4F6F),
+        backgroundColor: const Color(0xffcc9f1f),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -38,7 +38,7 @@ class PatentDesc extends StatelessWidget {
             utility.buildDetailRow("Patent URL", details["url"]!, context),
             utility.buildDetailRow(
                 "Attached Document", details["document"]!, context,
-                isDocumentType: true),
+                isDocumentType: true, documentName: details['documentname']),
           ],
         ),
       ),

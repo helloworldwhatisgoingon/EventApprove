@@ -93,7 +93,7 @@ class _StudentsAchievementsCPState extends State<StudentsAchievementsCP> {
         certificateProofPath: _currentAchievementDetails["certificateProof"],
         gpsPhotoPath: _currentAchievementDetails["gpsPhoto"],
         reportPath: _currentAchievementDetails["report"],
-        identifier: 0,
+        identifier: '0',
       );
 
       await repository.sendEvent(

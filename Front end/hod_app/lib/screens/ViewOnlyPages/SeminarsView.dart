@@ -87,6 +87,7 @@ class _SeminarsViewState extends State<SeminarsView> {
         openDatePicker: openDatePicker,
         conferences: seminars,
         filename: 'Seminars',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

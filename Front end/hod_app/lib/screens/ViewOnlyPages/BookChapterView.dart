@@ -89,6 +89,7 @@ class _BookChapterViewState extends State<BookChapterView> {
         openDatePicker: openDatePicker,
         conferences: bookChapters,
         filename: 'Book Chapters',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

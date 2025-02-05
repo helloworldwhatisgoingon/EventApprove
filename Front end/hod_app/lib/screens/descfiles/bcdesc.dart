@@ -13,7 +13,7 @@ class BCDesc extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Book Chapter Details"),
-        backgroundColor: const Color(0xff2F4F6F),
+        backgroundColor: const Color(0xffcc9f1f),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -36,7 +36,7 @@ class BCDesc extends StatelessWidget {
               onPressed: () {
                 utility.viewDocument(
                   details['document'],
-                  details["papertitle"] ?? 'Document',
+                  details["documentname"] ?? 'Document',
                   context,
                 );
                 ScaffoldMessenger.of(context).showSnackBar(

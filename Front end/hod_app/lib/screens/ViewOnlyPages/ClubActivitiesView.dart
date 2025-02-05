@@ -87,6 +87,7 @@ class _ClubActivitiesViewState extends State<ClubActivitiesView> {
         openDatePicker: openDatePicker,
         conferences: clubActivities,
         filename: 'Club Activity',
+        onRefresh: fetchEvent
       ),
       body: ListView.builder(
         itemCount: filteredConferences.length,

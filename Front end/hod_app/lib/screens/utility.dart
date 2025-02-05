@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:mime/mime.dart';
 
 class Utility {
   Future<void> viewDocument(
@@ -10,15 +9,6 @@ class Utility {
     try {
       // Decode the Base64 string to bytes
       Uint8List bytes = base64Decode(base64PDF);
-      String fileExtension;
-
-      // Detect the MIME type from the bytes
-      String? mimeType = lookupMimeType('', headerBytes: bytes);
-      if (mimeType == null) {
-        fileExtension = 'pdf';
-      } else {
-        fileExtension = mimeType.split('/').last;
-      }
 
       // Get the Downloads directory
       final downloadsDir = await getDownloadsDirectory();
@@ -27,7 +17,7 @@ class Utility {
       }
 
       // Create a file path in the Downloads directory
-      final filePath = '${downloadsDir.path}/$fileName.$fileExtension';
+      final filePath = '${downloadsDir.path}/$fileName';
 
       // Write the bytes to a file
       final file = File(filePath);
@@ -35,8 +25,7 @@ class Utility {
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('File saved to Downloads: $fileName.$fileExtension')),
+        SnackBar(content: Text('File saved to Downloads: $fileName')),
       );
     } catch (e) {
       debugPrint('Error viewing document: $e');
@@ -56,7 +45,7 @@ class Utility {
   }
 
   Widget buildDetailRow(String label, String value, BuildContext context,
-      {bool isDocumentType = false}) {
+      {bool isDocumentType = false, String documentName = 'unknown'}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -82,16 +71,11 @@ class Utility {
                   onPressed: () {
                     viewDocument(
                       value,
-                      label,
+                      documentName,
                       context,
                     );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Document downloaded successfully!"),
-                      ),
-                    );
                   },
-                  child: const Text("Download Attachment"),
+                  child: Text("Download $documentName"),
                 ),
               ),
               child: Text(

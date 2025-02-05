@@ -103,7 +103,7 @@ class _ProfessionalSocietiesCPState extends State<ProfessionalSocietiesCP> {
         participantsListPath: _currentSocietyDetails["participantsList"],
         certificatesPath: _currentSocietyDetails["certificates"],
         speakerDetails: _currentSocietyDetails["speakerDetails"],
-        identifier: 0,
+        identifier:" 0",
       );
 
       await repository.sendEvent(

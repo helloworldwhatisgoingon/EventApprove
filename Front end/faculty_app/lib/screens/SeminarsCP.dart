@@ -104,7 +104,7 @@ class _SeminarsCPState extends State<SeminarsCP> {
         speakersDetails: _seminarDetails["speakersDetails"],
         sanctionedAmount: _seminarDetails["sanctionedAmount"],
         facultyReceivingAmount: _seminarDetails["facultyReceivingAmount"],
-        identifier: 0, // cardcoded dummy val
+        identifier: '0', // cardcoded dummy val
         brochurePath: _seminarDetails["brochure"], // Optional
         gpsMediaPath: _seminarDetails["gpsMedia"], // Optional
         reportPath: _seminarDetails["report"], // Optional
