@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class Repository {
-  Config config = Config();
   Dio dio = Dio();
 
   // Constructor to initialize Dio instance
@@ -391,5 +390,20 @@ class Repository {
         SnackBar(content: Text('Error: $e')),
       );
     }
+  }
+
+  Future<bool> pingServer(String ip) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://$ip:5001/centralized/ping'),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Server is reachable
+      }
+    } catch (e) {
+      print('Error pinging server: $e');
+    }
+    return false; // Server unreachable
   }
 }

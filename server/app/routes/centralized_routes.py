@@ -357,7 +357,14 @@ def register():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-        
+
+@bp.route('/ping', methods=['GET'])
+def ping():
+    try:
+        return jsonify({'message': 'Server is running'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 def get_event_model(event_type):
     """Helper function to return the corresponding model based on event type."""
     match event_type:
