@@ -21,8 +21,6 @@ class Repository {
     return null;
   }
 
-  Config config = Config();
-
   Future<void> sendEvent({
     required String eventType,
     required String eventName,
@@ -1005,5 +1003,19 @@ class Repository {
         SnackBar(content: Text('Error: $e')),
       );
     }
+  }
+   Future<bool> pingServer(String ip) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://$ip:5001/centralized/ping'),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Server is reachable
+      }
+    } catch (e) {
+      print('Error pinging server: $e');
+    }
+    return false; // Server unreachable
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:faculty_app/config.dart';
 import 'package:faculty_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,6 +43,32 @@ class _LoginScreenState extends State<LoginScreen> {
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
     );
+  }
+
+  final TextEditingController ipController = TextEditingController();
+  String message = "";
+
+  final RegExp ipRegex =
+      RegExp(r'^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$'); // IPv4 validation regex
+
+  void verifyIP() async {
+    String ip = ipController.text.trim();
+    if (!ipRegex.hasMatch(ip)) {
+      setState(() {
+        message = "❌ Invalid IPv4 address!";
+      });
+      return;
+    }
+
+    bool success = await repository.pingServer(ip);
+    setState(() {
+      if (success) {
+        config.setBaseURL("http://$ip:5001");
+        message = "✅ Server connected successfully!";
+      } else {
+        message = "❌ Server not found / not running!";
+      }
+    });
   }
 
   Future<Map<String, dynamic>?> getUserDetails() async {
@@ -267,8 +294,53 @@ class _LoginScreenState extends State<LoginScreen> {
                           "Register",
                           style: TextStyle(fontSize: 16),
                         ),
+                        
                       ),
                     ],
+                  ),
+                   const SizedBox(
+                    height: 20,
+                  ),
+                  const Text('Server IP Address',
+                      style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: ipController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      hintText: 'Enter server IP',
+                    ),
+                  ),
+                  if (message.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        message,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color:
+                              message.contains("✅") ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: verifyIP,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 15,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('Verify'),
                   ),
                 ],
               ),
