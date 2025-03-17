@@ -1,5 +1,6 @@
-import 'package:hod_app/screens/utility.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:hod_app/screens/utility.dart';
 
 Utility utility = Utility();
 
@@ -35,7 +36,7 @@ class _EventDescState extends State<EventDesc> {
                 "Publication Date", widget.details["publicationdate"]!),
             _buildDetailRow("Publisher", widget.details["publisher"]!),
             _buildDetailRow("DOI, ISBN", widget.details["doiisbn"]!),
-            _buildDetailRow("Proof Link", widget.details["prooflink"]!),
+            _buildClickableLink("Proof Link", widget.details["prooflink"]!),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -44,7 +45,7 @@ class _EventDescState extends State<EventDesc> {
                   base64Document,
                   widget.details["documentname"] ?? 'unknowndoc.pdf',
                   context,
-                ); // Handle document viewing or downloading
+                );
               },
               child: const Text("Download Document"),
             ),
@@ -75,6 +76,50 @@ class _EventDescState extends State<EventDesc> {
             child: Text(
               value,
               style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClickableLink(String label, String url) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              "$label:",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: InkWell(
+              onTap: () async {
+                final Uri uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Cannot open the link")),
+                  );
+                }
+              },
+              child: Text(
+                url,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ),
         ],
