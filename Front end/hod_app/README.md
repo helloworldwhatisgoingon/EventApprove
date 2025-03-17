@@ -1,3 +1,3 @@
 # hod_app
-
-A new Flutter project.
+Make sure to run this command before running hod app:
+                                                     flutter pub add url_launcher
