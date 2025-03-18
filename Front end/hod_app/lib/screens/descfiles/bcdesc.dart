@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hod_app/screens/utility.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Utility utility = Utility();
 
@@ -28,9 +29,8 @@ class BCDesc extends StatelessWidget {
             _buildDetailRow("Publication Date", details["publicationdate"]!),
             _buildDetailRow("Publisher", details["publisher"]!),
             _buildDetailRow("DOI", details["doi"]!),
-            _buildDetailRow("Proof Link", details["prooflink"]!),
-            _buildDetailRow(
-                "Scopus ID/WoS ID/ORCID ID", details["identifier"].toString()),
+            _buildLinkRow("Proof Link", details["prooflink"]!),
+            _buildDetailRow("Scopus ID/WoS ID/ORCID ID", details["identifier"].toString()),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -74,6 +74,46 @@ class BCDesc extends StatelessWidget {
             child: Text(
               value,
               style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinkRow(String label, String url) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              "$label:",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: GestureDetector(
+              onTap: () async {
+                final Uri uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Text(
+                url,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ),
         ],
