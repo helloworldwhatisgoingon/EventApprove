@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:faculty_app/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as path;
 
 Repository repository = Repository();
 
@@ -321,6 +323,27 @@ class _ConferencesCPState extends State<ConferencesCP> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Conference Submission'),
+        actions: [
+          // Add Preview button in the app bar
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PreviewPage(
+                        conferenceDetails: _currentConferenceDetails),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.preview,
+              ),
+              label: const Text('Preview', style: TextStyle()),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -440,6 +463,338 @@ class ProposalStepsWidget extends StatelessWidget {
           );
         }),
       ),
+    );
+  }
+}
+
+class PreviewPage extends StatelessWidget {
+  final Map<String, dynamic> conferenceDetails;
+
+  const PreviewPage({Key? key, required this.conferenceDetails})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Preview Submission'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: Text(
+                'Submission Preview',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff2F4F6F),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Display all the text fields
+            _buildInfoSection('Paper Details', [
+              _buildPreviewItem(
+                  'Paper Title', conferenceDetails['paperTitle'] ?? ''),
+              _buildPreviewItem(
+                  'Abstract', conferenceDetails['abstract'] ?? ''),
+            ]),
+
+            _buildInfoSection('Conference Information', [
+              _buildPreviewItem(
+                  'Conference Name', conferenceDetails['conferenceName'] ?? ''),
+              _buildPreviewItem('Publication Level',
+                  conferenceDetails['publicationLevel'] ?? ''),
+              _buildPreviewItem('Publication Date',
+                  conferenceDetails['publicationDate'] ?? ''),
+              _buildPreviewItem(
+                  'Publisher', conferenceDetails['publisher'] ?? ''),
+              _buildPreviewItem('DOI/ISBN', conferenceDetails['doiIsbn'] ?? ''),
+              _buildPreviewItem(
+                  'Proof Link', conferenceDetails['proofLink'] ?? ''),
+              _buildPreviewItem(
+                  'Identifier', conferenceDetails['identifier'] ?? ''),
+            ]),
+
+            // Display document preview if path exists
+            if (conferenceDetails['document'] != null)
+              _buildDocumentPreview(context, conferenceDetails['document']),
+
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(String title, List<Widget> children) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xff2F4F6F),
+              ),
+            ),
+            const Divider(),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreviewItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value.isEmpty ? 'Not provided' : value,
+            style: TextStyle(
+              fontSize: 16,
+              color: value.isEmpty ? Colors.grey : Colors.black,
+            ),
+          ),
+          const SizedBox(height: 4),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentPreview(BuildContext context, String documentPath) {
+    // Get the filename from the path
+    String filename = path.basename(documentPath);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Uploaded Document',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xff2F4F6F),
+              ),
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+
+            // File Preview Container
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      _getFileTypeIcon(filename),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          filename,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // File preview based on file type
+                  _buildFilePreviewContent(context, documentPath, filename),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getFileTypeIcon(String filename) {
+    if (filename.toLowerCase().endsWith('.pdf')) {
+      return const Icon(Icons.picture_as_pdf, color: Colors.red, size: 32);
+    } else if (_isImageFile(filename)) {
+      return const Icon(Icons.image, color: Colors.blue, size: 32);
+    } else if (filename.toLowerCase().endsWith('.doc') ||
+        filename.toLowerCase().endsWith('.docx')) {
+      return const Icon(Icons.description, color: Colors.blue, size: 32);
+    } else {
+      return const Icon(Icons.insert_drive_file, color: Colors.grey, size: 32);
+    }
+  }
+
+  bool _isImageFile(String filename) {
+    return filename.toLowerCase().endsWith('.jpg') ||
+        filename.toLowerCase().endsWith('.jpeg') ||
+        filename.toLowerCase().endsWith('.png') ||
+        filename.toLowerCase().endsWith('.gif') ||
+        filename.toLowerCase().endsWith('.bmp');
+  }
+
+  Widget _buildFilePreviewContent(
+      BuildContext context, String documentPath, String filename) {
+    // Check if it's an image file
+    if (_isImageFile(filename)) {
+      return GestureDetector(
+        onTap: () {
+          // Optional: Open full image view
+          _showFullImageDialog(context, documentPath);
+        },
+        child: Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.file(
+                File(documentPath),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, size: 48, color: Colors.red),
+                        SizedBox(height: 8),
+                        Text('Unable to load image',
+                            style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const Positioned(
+                bottom: 8,
+                right: 8,
+                child: Icon(
+                  Icons.zoom_in,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 10.0,
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    // Check if it's a PDF
+    else if (filename.toLowerCase().endsWith('.pdf')) {
+      return Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.picture_as_pdf, size: 48, color: Colors.red),
+              SizedBox(height: 8),
+              Text('PDF Document', style: TextStyle(color: Colors.grey)),
+              SizedBox(height: 4),
+              Text('Tap to view full document',
+                  style: TextStyle(color: Colors.grey, fontSize: 12)),
+            ],
+          ),
+        ),
+      );
+    }
+    // For other file types
+    else {
+      return Container(
+        height: 120,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _getFileTypeIcon(filename),
+              const SizedBox(height: 8),
+              const Text('File attached', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 4),
+              Text(filename,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  void _showFullImageDialog(BuildContext context, String imagePath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Stack(
+            children: [
+              Image.file(
+                File(imagePath),
+                width: double.infinity,
+                fit: BoxFit.contain,
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black54,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

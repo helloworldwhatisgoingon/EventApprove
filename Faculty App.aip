@@ -24,14 +24,13 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1" DirectoryOptions="3"/>
-    <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
     <ROW Directory="Release_Dir" Directory_Parent="APPDIR" DefaultDir="Release" DirectoryOptions="3"/>
-    <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="assets_Dir" Directory_Parent="flutter_assets_Dir" DefaultDir="assets" DirectoryOptions="3"/>
     <ROW Directory="data_Dir" Directory_Parent="Release_Dir" DefaultDir="data" DirectoryOptions="3"/>
     <ROW Directory="flutter_assets_Dir" Directory_Parent="data_Dir" DefaultDir="FLUTTE~1|flutter_assets" DirectoryOptions="3"/>
     <ROW Directory="fonts_Dir" Directory_Parent="flutter_assets_Dir" DefaultDir="fonts" DirectoryOptions="3"/>
+    <ROW Directory="lib_Dir" Directory_Parent="flutter_assets_Dir" DefaultDir="lib" DirectoryOptions="3"/>
     <ROW Directory="shaders_Dir" Directory_Parent="flutter_assets_Dir" DefaultDir="shaders" DirectoryOptions="3"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SideBySideGuidComponent">
@@ -40,16 +39,16 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="APPDIR" ComponentId="{D7BB62A4-0DDA-41FE-8EB5-9D3A8CCFBE34}" Directory_="APPDIR" Attributes="0"/>
-    <ROW Component="AssetManifest.bin" ComponentId="{28699D1C-3A64-42B9-A31E-F24EF78EDC65}" Directory_="flutter_assets_Dir" Attributes="0" KeyPath="AssetManifest.bin" Type="0"/>
-    <ROW Component="MaterialIconsRegular.otf" ComponentId="{D9D4EE72-AC8B-4828-97CE-7D2D9A378E96}" Directory_="fonts_Dir" Attributes="0" KeyPath="MaterialIconsRegular.otf" Type="0"/>
+    <ROW Component="AssetManifest.bin" ComponentId="{34D198FA-0932-4DB2-83CA-4A497DDC10A4}" Directory_="flutter_assets_Dir" Attributes="0" KeyPath="AssetManifest.bin" Type="0"/>
+    <ROW Component="MaterialIconsRegular.otf" ComponentId="{43C4F96E-4DEC-4792-AAE7-CC08411CD91A}" Directory_="fonts_Dir" Attributes="0" KeyPath="MaterialIconsRegular.otf" Type="0"/>
     <ROW Component="ProductInformation" ComponentId="{EE8BA086-5374-42BD-AED4-7265BBCF3F03}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
-    <ROW Component="SHORTCUTDIR" ComponentId="{B1E268FA-180D-4197-A3B9-B814E0357DBC}" Directory_="SHORTCUTDIR" Attributes="0"/>
-    <ROW Component="app.so" ComponentId="{DFA103A3-B28F-4345-AE5C-ED1A34FCA84B}" Directory_="data_Dir" Attributes="0" KeyPath="app.so" Type="0"/>
-    <ROW Component="cover.jpeg" ComponentId="{F91694CE-9EE4-4064-9600-9399ACF0D9DE}" Directory_="assets_Dir" Attributes="0" KeyPath="cover.jpeg" Type="0"/>
-    <ROW Component="faculty_app.exe" ComponentId="{DFCFF171-D523-416A-9EC4-2DFC40984F4C}" Directory_="Release_Dir" Attributes="256" KeyPath="faculty_app.exe"/>
-    <ROW Component="flutter_windows.dll" ComponentId="{BBB1926A-082A-40C5-806F-0CD7EBAD7636}" Directory_="Release_Dir" Attributes="256" KeyPath="flutter_windows.dll"/>
-    <ROW Component="ink_sparkle.frag" ComponentId="{9B013F5B-09B0-46F6-8386-897F00298649}" Directory_="shaders_Dir" Attributes="0" KeyPath="ink_sparkle.frag" Type="0"/>
-    <ROW Component="url_launcher_windows_plugin.dll" ComponentId="{61F9C8C5-70E2-445C-8678-A4F3A41AA861}" Directory_="Release_Dir" Attributes="256" KeyPath="url_launcher_windows_plugin.dll"/>
+    <ROW Component="app.so" ComponentId="{24AD4935-2781-44A2-BAE4-60189670E88D}" Directory_="data_Dir" Attributes="0" KeyPath="app.so" Type="0"/>
+    <ROW Component="cover.jpeg" ComponentId="{4A2DB726-A074-4214-AA64-D4745D834E3F}" Directory_="assets_Dir" Attributes="0" KeyPath="cover.jpeg" Type="0"/>
+    <ROW Component="faculty_app.exe" ComponentId="{B0F20933-EB32-45DA-8F13-5B5E44CBC50A}" Directory_="Release_Dir" Attributes="256" KeyPath="faculty_app.exe"/>
+    <ROW Component="flutter_windows.dll" ComponentId="{99F56BBE-F761-470D-BE4C-D145AAA5EFB3}" Directory_="Release_Dir" Attributes="256" KeyPath="flutter_windows.dll"/>
+    <ROW Component="ink_sparkle.frag" ComponentId="{40A36644-EC59-407B-8F1E-202F8BF83D48}" Directory_="shaders_Dir" Attributes="0" KeyPath="ink_sparkle.frag" Type="0"/>
+    <ROW Component="lib" ComponentId="{29E405EF-07E5-4972-BE44-A2F4A55E857C}" Directory_="lib_Dir" Attributes="0"/>
+    <ROW Component="url_launcher_windows_plugin.dll" ComponentId="{292DCEA4-F3AD-4050-A5F5-7AA400FF3760}" Directory_="Release_Dir" Attributes="256" KeyPath="url_launcher_windows_plugin.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
@@ -123,7 +122,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
-    <ROW Directory_="SHORTCUTDIR" Component_="SHORTCUTDIR" ManualDelete="false"/>
+    <ROW Directory_="lib_Dir" Component_="lib" ManualDelete="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
@@ -151,7 +150,7 @@
     <ROW Feature_="MainFeature" Component_="faculty_app.exe"/>
     <ROW Feature_="MainFeature" Component_="flutter_windows.dll"/>
     <ROW Feature_="MainFeature" Component_="url_launcher_windows_plugin.dll"/>
-    <ROW Feature_="MainFeature" Component_="SHORTCUTDIR"/>
+    <ROW Feature_="MainFeature" Component_="lib"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
@@ -181,10 +180,6 @@
     <ROW Registry="ProductName" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="\"/>
     <ROW Registry="Software" Root="-1" Key="Software" Name="\"/>
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
-  </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="FacultyApp" Directory_="SHORTCUTDIR" Name="FACULT~1|Faculty App" Component_="faculty_app.exe" Target="[#faculty_app.exe]" Description="Event Approve Faculty App (Dsu)" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="Release_Dir"/>
-    <ROW Shortcut="FacultyApp_1" Directory_="DesktopFolder" Name="FACULT~1|Faculty App" Component_="faculty_app.exe" Target="[#faculty_app.exe]" Description="Event Approve Faculty App (Dsu)" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="Release_Dir"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>
